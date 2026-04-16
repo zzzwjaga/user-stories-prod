@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS stories(
+    id UUID PRIMARY KEY,
+    number VARCHAR(100) NOT NULL,
+    story_text TEXT NOT NULL,
+    story_points INT,
+    board_id UUID NOT NULL REFERENCES boards(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

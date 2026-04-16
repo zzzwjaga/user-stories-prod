@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS statuses (
+    id UUID PRIMARY KEY,
+    status VARCHAR(255) NOT NULL UNIQUE
+);

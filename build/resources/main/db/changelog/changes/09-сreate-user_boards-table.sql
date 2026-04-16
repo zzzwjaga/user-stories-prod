@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS user_boards (
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    board_id UUID REFERENCES boards(id) ON DELETE CASCADE,
+    role_id UUID REFERENCES roles(id) ON DELETE CASCADE
+);

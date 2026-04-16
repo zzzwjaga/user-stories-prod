@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS boards (
+    id UUID PRIMARY KEY,
+    owner_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    boardname VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+

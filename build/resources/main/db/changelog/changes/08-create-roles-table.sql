@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS roles (
+    id UUID PRIMARY KEY,
+    rolename VARCHAR(255) NOT NULL UNIQUE
+);
+

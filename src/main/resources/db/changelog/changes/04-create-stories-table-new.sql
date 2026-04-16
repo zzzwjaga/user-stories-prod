@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS stories;
+
+CREATE TABLE stories (
+    id UUID PRIMARY KEY,
+    number VARCHAR(100) NOT NULL,
+    story_text TEXT NOT NULL,
+    story_points INT,
+    board_id UUID NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+    author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
