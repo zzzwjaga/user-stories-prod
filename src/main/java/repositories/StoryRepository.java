@@ -1,9 +1,11 @@
 package repositories;
 
 import com.prod.user_stories_prod.entities.Story;
+import exseptions.ValidationException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import responses.ErrorCode;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,12 @@ public class StoryRepository {
         return stories;
     }
 
+    public Optional<Story> findById (UUID id)
+    {
+        String sql = "SELECT * FROM stories WHERE id = :id;";
+        return namedParameterJdbcTemplate.query(sql, Map.of("id", id), STORY_ROW_MAPPER);
+    }
+
     public boolean createStory(Story story) {
         String sql = """
         INSERT INTO stories (id, number, story_text, story_points, board_id, author_id, created_at, updated_at)
@@ -60,11 +68,9 @@ public class StoryRepository {
     public boolean updateStory(Story story) {
         String sql = """
         UPDATE stories 
-        SET number = :number,
+        SET 
             story_text = :story_text,
             story_points = :story_points,
-            board_id = :board_id,
-            author_id = :author_id,
             updated_at = CURRENT_TIMESTAMP
         WHERE id = :id
         """;
