@@ -1,15 +1,13 @@
-package services;
+package com.prod.user_stories_prod.services;
 
 import com.prod.user_stories_prod.entities.Story;
-import exseptions.ValidationException;
+import com.prod.user_stories_prod.exseptions.ValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import repositories.StoryRepository;
-import requests.CreateStoryRequest;
-import requests.FindAllByBoardRequest;
-import requests.FindStoryByNumberRequest;
-import requests.UpdateStoryRequest;
-import responses.ErrorCode;
+import com.prod.user_stories_prod.repositories.StoryRepository;
+import com.prod.user_stories_prod.requests.CreateStoryRequest;
+import com.prod.user_stories_prod.requests.UpdateStoryRequest;
+import com.prod.user_stories_prod.responses.ErrorCode;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,9 +23,9 @@ public class StoryService {
     }
 
     @Transactional
-    public Story createStory(CreateStoryRequest request) {
+    public Story createStory(UUID board_id, CreateStoryRequest request) {
         storyRepository.lockOnValue(request.number());
-        Optional<Story> maybeStory = storyRepository.findByNumber(request.board_id(), request.number());
+        Optional<Story> maybeStory = storyRepository.findByNumber(board_id, request.number());
         if (maybeStory.isPresent()) {
             throw new ValidationException(String.valueOf(ErrorCode.STORY_ALREADY_EXISTS));
         }
@@ -36,7 +34,7 @@ public class StoryService {
                 request.number(),
                 request.story_points(),
                 request.story_text(),
-                request.board_id(),
+                board_id,
                 request.author_id()
         );
         if(!storyRepository.createStory(newStory))
@@ -47,20 +45,20 @@ public class StoryService {
     }
 
     @Transactional
-    public Story findStoryByNumber(FindStoryByNumberRequest request) {
-        Optional<Story> maybeStory = storyRepository.findByNumber(request.board_id(),request.number());
+    public Story findStoryByNumber(UUID board_id, String number) {
+        Optional<Story> maybeStory = storyRepository.findByNumber(board_id, number);
         if (maybeStory.isEmpty()) {throw new ValidationException(String.valueOf(ErrorCode.STORY_NOT_FOUND));}
         return maybeStory.get();
     }
 
     @Transactional
-    List<Story> findAllByBoard (FindAllByBoardRequest request) {
-        return storyRepository.findAllByBoard(request.board_id());
+    public List<Story> findAllByBoard (UUID board_id) {
+        return storyRepository.findAllByBoard(board_id);
     }
 
     @Transactional
-    public Story updateStory(UpdateStoryRequest request) {
-        Optional<Story> existingStory = storyRepository.findById(request.id();
+    public Story updateStory(UUID story_id, UpdateStoryRequest request) {
+        Optional<Story> existingStory = storyRepository.findById(story_id);
         if (existingStory.isEmpty()) {
             throw new ValidationException(String.valueOf(ErrorCode.STORY_NOT_FOUND));
         }
@@ -88,4 +86,6 @@ public class StoryService {
             }
         return true;
     }
+
+
 }

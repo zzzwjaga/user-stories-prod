@@ -1,11 +1,9 @@
-package repositories;
+package com.prod.user_stories_prod.repositories;
 
 import com.prod.user_stories_prod.entities.Story;
-import exseptions.ValidationException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import responses.ErrorCode;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +22,7 @@ public class StoryRepository {
         String sql = "SELECT * FROM stories WHERE board_id = :board_id AND number = :number FOR UPDATE;";
         List<Story> stories = namedParameterJdbcTemplate.query(sql, Map.of("board_id", board_id, "number", number), STORY_ROW_MAPPER);
         if (stories.size() > 1) {
-            throw new RuntimeException("More than one profile found for this board and number: " + board_id + number);
+            throw new RuntimeException("More than one stories found for this board and number: " + board_id + number);
         }
         if (stories.isEmpty()) {
             return Optional.empty();
@@ -41,10 +39,11 @@ public class StoryRepository {
         return stories;
     }
 
-    public Optional<Story> findById (UUID id)
-    {
-        String sql = "SELECT * FROM stories WHERE id = :id;";
-        return namedParameterJdbcTemplate.query(sql, Map.of("id", id), STORY_ROW_MAPPER);
+    public Optional<Story> findById(UUID id) {
+        String sql = "SELECT * FROM stories WHERE id = :id";
+        return namedParameterJdbcTemplate.query(sql, Map.of("id", id), STORY_ROW_MAPPER)
+                .stream()
+                .findFirst();
     }
 
     public boolean createStory(Story story) {
