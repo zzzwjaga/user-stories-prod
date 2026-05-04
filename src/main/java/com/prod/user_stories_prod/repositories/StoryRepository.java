@@ -81,7 +81,7 @@ public class StoryRepository {
                 "board_id", story.board_id(),
                 "author_id", story.author_id()
         ));
-        return rowsAffected > 0;
+        return rowsAffected == 1;
     }
 
     public boolean deleteStory(UUID id) {

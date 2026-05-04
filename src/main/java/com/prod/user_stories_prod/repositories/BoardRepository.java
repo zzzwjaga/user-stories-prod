@@ -3,12 +3,14 @@ package com.prod.user_stories_prod.repositories;
 import com.prod.user_stories_prod.entities.Board;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public class BoardRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -48,6 +50,22 @@ public class BoardRepository {
         return boards.stream().findFirst();
     }
 
+    //переписать под пользователя таблицы
+    public Optional<Board> findByName(UUID owner_id, String boardname) {
+        String sql = "SELECT * FROM boards WHERE owner_id = :owner_id AND boardname = :boardname";
+        List<Board> boards = namedParameterJdbcTemplate.query(sql, Map.of(
+                "owner_id", owner_id,
+                "boardname", boardname
+                ), BOARD_ROW_MAPPER);
+        if (boards.size() > 1) {
+            throw new RuntimeException("More than one boards found by this owner_id: " + owner_id + "this boardname: " + boardname);
+        }
+        if (boards.isEmpty()) {
+            return Optional.empty();
+        }
+        return boards.stream().findFirst();
+    }
+
     public boolean CreateBoard(Board board) {
         String sql = """
          INSERT INTO boards (id, owner_id, boardname, description, created_at, updated_at)
@@ -64,6 +82,32 @@ public class BoardRepository {
         return rowsAffected == 1;
     }
 
+    public boolean UpdateBoard(Board board){
+        String sql = """
+        UPDATE boards
+            SET boardname = :boardname,
+            description = :description,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = :id
+        """;
+        int  rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of(
+                "id", board.id(),
+                "owner_id", board.owner_id(),
+                "boardname", board.boardname(),
+                "description", board.description(),
+                "created_at",  board.created_at(),
+                "updated_at", board.updated_at()
+        ));
+        return rowsAffected == 1;
+    }
+
+    public boolean DeleteBoard(UUID id) {
+        String sql = """
+        DELETE FROM boards WHERE id = :id
+        """;
+        int  rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of("id", id));
+        return rowsAffected == 1;
+    }
 
     public void lockOnValue(Object value){
         String sql = "SELECT pg_advisory_xact_lock(hashtext(:lock));";

@@ -77,14 +77,13 @@ public class StoryService {
     }
 
     @Transactional
-    public boolean deleteStory(UUID id) {
+    public void deleteStory(UUID id) {
         Optional<Story> maybeStory = storyRepository.findById(id);
         if (maybeStory.isEmpty()) {throw new ValidationException(String.valueOf(ErrorCode.STORY_NOT_FOUND));}
         if(!storyRepository.deleteStory(id))
             {
             throw new ValidationException("Story could not be deleted");
             }
-        return true;
     }
 
 
