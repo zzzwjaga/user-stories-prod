@@ -5,4 +5,6 @@ public enum ErrorCode {
      STORY_NOT_FOUND,
      BOARD_ALREADY_EXISTS,
      BOARD_NOT_FOUND,
+     USER_ALREADY_EXISTS,
+     USER_NOT_FOUND
 }

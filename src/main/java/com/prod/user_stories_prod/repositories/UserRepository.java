@@ -5,10 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -53,6 +50,56 @@ public class UserRepository {
             throw new RuntimeException("More than one users found for this email" + email);
         }
         return  users.stream().findFirst();
+    }
+
+    public List<User> findAll() {
+        String sql = """
+                SELECT username, email
+                FROM users
+                ORDER BY username ASC
+        """;
+        return  namedParameterJdbcTemplate.query(sql, USER_ROW_MAPPER);
+    }
+
+
+    public boolean createUser(User user) {
+        String sql = """
+                INSERT INTO users(id, username, email, password_hash, created_at, updated_at)
+                VALUES (:id, :username, :email, :passwordHash, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """;
+        Map<String,Object> params = Map.of(
+                "id", user.id(),
+                "username", user.username(),
+                "email", user.email(),
+                "passowrd_hash", user.password_hash()
+        );
+        int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
+        return rowsAffected > 0;
+    }
+
+    public boolean updateUser(User user) {
+        String sql = """
+                UPDATE users
+                SET username = :username,
+                email = :email,
+                updated_at = CURRENT_TIMESTAMP
+        """;
+        Map<String,Object> params = Map.of(
+                "id", user.id(),
+                "username", user.username(),
+                "email", user.email(),
+                "password_hash", user.password_hash()
+        );
+        int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
+        return rowsAffected > 0;
+    }
+
+    public boolean deleteUser(UUID id) {
+        String sql = """
+                DELETE FROM users WHERE id = :id
+        """;
+        int rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of("id", id));
+        return rowsAffected > 0;
     }
 
     public void lockOnValue(Object value){
