@@ -19,7 +19,7 @@ public class StoryRepository {
     }
 
     public Optional<Story> findByNumber(UUID board_id, String number) {
-        String sql = "SELECT * FROM stories WHERE board_id = :board_id AND number = :number FOR UPDATE;";
+        String sql = "SELECT * FROM stories WHERE board_id = :board_id AND number = :number;";
         List<Story> stories = namedParameterJdbcTemplate.query(sql, Map.of("board_id", board_id, "number", number), STORY_ROW_MAPPER);
         if (stories.size() > 1) {
             throw new RuntimeException("More than one stories found for this board and number: " + board_id + number);

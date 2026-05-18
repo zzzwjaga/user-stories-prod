@@ -24,7 +24,7 @@ public class StoryService {
 
     @Transactional
     public Story createStory(UUID board_id, CreateStoryRequest request) {
-        storyRepository.lockOnValue(request.number());
+        storyRepository.lockOnValue(request.number() + board_id.toString());
         Optional<Story> maybeStory = storyRepository.findByNumber(board_id, request.number());
         if (maybeStory.isPresent()) {
             throw new ValidationException(String.valueOf(ErrorCode.STORY_ALREADY_EXISTS));

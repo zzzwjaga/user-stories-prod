@@ -17,3 +17,9 @@ databaseChangeLog:
         file: db/changelog/changes/08-create-roles-table.sql
   - include:
       file: db/changelog/changes/09-сreate-user_boards-table.sql
+  - include:
+      file: db/changelog/changes/11-add-author_id-column.sql
+  - include:
+      file: db/changelog/changes/12-add-user_boards-primary_key.sql
+  - include:
+      file: db/changelog/changes/10-create-indexes.sql

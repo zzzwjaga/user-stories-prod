@@ -1,0 +1,1 @@
+ALTER TABLE stories ADD CONSTRAINT uq_story_board_number UNIQUE(board_id, number);
