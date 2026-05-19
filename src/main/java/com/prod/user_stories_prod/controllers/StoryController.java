@@ -3,6 +3,7 @@ package com.prod.user_stories_prod.controllers;
 import com.prod.user_stories_prod.entities.Story;
 import com.prod.user_stories_prod.requests.CreateStoryRequest;
 import com.prod.user_stories_prod.requests.UpdateStoryRequest;
+import com.prod.user_stories_prod.services.StoryTemplateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,11 @@ import java.util.UUID;
 public class StoryController {
 
     private final StoryService storyService;
+    private final StoryTemplateService storyTemplateService;
 
-    public StoryController(StoryService storyService) {
+    public StoryController(StoryService storyService, StoryTemplateService storyTemplateService) {
         this.storyService = storyService;
+        this.storyTemplateService = storyTemplateService;
     }
 
     @GetMapping("/boards/{board_id}/stories")
@@ -40,6 +43,12 @@ public class StoryController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(story);
+    }
+
+    @GetMapping("/template")
+    public String getTemplate()
+    {
+        return storyTemplateService.getTemplate();
     }
 
     @PostMapping("/boards/{board_id}/stories")

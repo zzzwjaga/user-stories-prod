@@ -1,0 +1,2 @@
+ALTER TABLE stories
+ADD COLUMN story_sequence BIGINT NOT NULL DEFAULT 0;

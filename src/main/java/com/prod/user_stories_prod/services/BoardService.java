@@ -3,7 +3,6 @@ package com.prod.user_stories_prod.services;
 import com.prod.user_stories_prod.entities.Board;
 import com.prod.user_stories_prod.exseptions.ValidationException;
 import com.prod.user_stories_prod.repositories.BoardRepository;
-import com.prod.user_stories_prod.repositories.StoryRepository;
 import com.prod.user_stories_prod.requests.CreateBoardRequest;
 import com.prod.user_stories_prod.requests.UpdateBoardRequest;
 import com.prod.user_stories_prod.responses.ErrorCode;
@@ -40,7 +39,7 @@ public class BoardService {
                 request.boardname(),
                 request.description()
         );
-        if(!boardRepository.CreateBoard(newBoard))
+        if(!boardRepository.createBoard(newBoard))
         {
             throw new ValidationException("Board could not be created");
         }
@@ -84,7 +83,7 @@ public class BoardService {
                 request.boardname(),
                 request.description()
         );
-        if(!boardRepository.UpdateBoard(updatedBoard))
+        if(!boardRepository.updateBoard(updatedBoard))
         {
             throw new ValidationException("Board could not be updated");
         }
@@ -98,7 +97,7 @@ public class BoardService {
         {
             throw new ValidationException(BOARD_NOT_FOUND);
         }
-        if(!boardRepository.DeleteBoard(id))
+        if(!boardRepository.deleteBoard(id))
         {
             throw new ValidationException("Board could not be deleted");
         }

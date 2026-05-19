@@ -23,3 +23,23 @@ databaseChangeLog:
       file: db/changelog/changes/12-add-user_boards-primary_key.sql
   - include:
       file: db/changelog/changes/10-create-indexes.sql
+  - include:
+      file: db/changelog/changes/13-add-unique-stories.sql
+  - include:
+     file: db/changelog/changes/14-add-story-sequence.sql
+  - include:
+      file: db/changelog/changes/15-drop-sequence.sql
+  - include:
+      file: db/changelog/changes/16-add-board-sequence.sql
+  - include:
+      file: db/changelog/changes/17-add-new-stories-statuses-table.sql
+  - include:
+      file: db/changelog/changes/18-fix-story-statuses.sql
+  - include:
+      file: db/changelog/changes/19-fix-user-boards-table.sql
+  - include:
+      file: db/changelog/changes/20-delete-migrations-19.sql
+  - include:
+      file: db/changelog/changes/21-fix-user-boards-table-v2.sql
+
+

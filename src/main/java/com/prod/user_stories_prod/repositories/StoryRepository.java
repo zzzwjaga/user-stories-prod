@@ -94,6 +94,8 @@ public class StoryRepository {
         return rowsAffected > 0;
     }
 
+
+
     public void lockOnValue(Object value){
         String sql = "SELECT pg_advisory_xact_lock(hashtext(:lock));";
         namedParameterJdbcTemplate.queryForObject(sql, Map.of("lock", value.toString()), Object.class);

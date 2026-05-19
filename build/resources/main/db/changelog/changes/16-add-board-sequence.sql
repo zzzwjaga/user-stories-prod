@@ -1,0 +1,2 @@
+ALTER TABLE boards
+ADD COLUMN story_sequence BIGINT NOT NULL DEFAULT 0;

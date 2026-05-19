@@ -66,7 +66,7 @@ public class BoardRepository {
         return boards.stream().findFirst();
     }
 
-    public boolean CreateBoard(Board board) {
+    public boolean createBoard(Board board) {
         String sql = """
          INSERT INTO boards (id, owner_id, boardname, description, created_at, updated_at)
          VALUES (:id, :owner_id, :boardname, :description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -82,7 +82,7 @@ public class BoardRepository {
         return rowsAffected == 1;
     }
 
-    public boolean UpdateBoard(Board board){
+    public boolean updateBoard(Board board){
         String sql = """
         UPDATE boards
             SET boardname = :boardname,
@@ -101,12 +101,23 @@ public class BoardRepository {
         return rowsAffected == 1;
     }
 
-    public boolean DeleteBoard(UUID id) {
+    public boolean deleteBoard(UUID id) {
         String sql = """
         DELETE FROM boards WHERE id = :id
         """;
         int  rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of("id", id));
         return rowsAffected == 1;
+    }
+
+    public Long getNextStoryNumber(UUID board_id) {
+        String sql = """
+        UPDATE boards
+        SET story_sequence = story_sequence+1
+        WHERE id = :board_id
+        RETURNING story_sequence
+        """;
+
+        return namedParameterJdbcTemplate.queryForObject(sql, Map.of("board_id", board_id), Long.class);
     }
 
     public void lockOnValue(Object value){
