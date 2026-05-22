@@ -3,12 +3,11 @@ package com.prod.user_stories_prod.repositories;
 import com.prod.user_stories_prod.entities.Role;
 import com.prod.user_stories_prod.entities.UserBoard;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class UserBoardRepository {
@@ -35,6 +34,87 @@ public class UserBoardRepository {
         int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
         return rowsAffected > 0;
     }
+
+    public List<UserBoard> findAllByUserId(UUID user_id)
+    {
+        String sql = """
+                SELECT *  FROM user_boards
+                WHERE user_id = :user_id
+                """;
+
+        return namedParameterJdbcTemplate.query(sql,Map.of("user_id", user_id), USER_BOARD_ROW_MAPPER);
+    }
+
+    public List<UserBoard> findAllByBoardId(UUID board_id)
+    {
+        String sql = """
+                SELECT *  FROM user_boards
+                WHERE board_id = :board_id
+        """;
+        return namedParameterJdbcTemplate.query(sql,Map.of("board_id", board_id), USER_BOARD_ROW_MAPPER);
+    }
+
+    public Optional<UserBoard> findByKey(UUID board_id, UUID user_id)
+    {
+        String sql = """
+                SELECT * FROM user_boards
+                WHERE user_id = :user_id
+                AND board_id = :board_id
+        """;
+
+        return namedParameterJdbcTemplate.query(sql,Map.of("user_id", user_id, "board_id", board_id), USER_BOARD_ROW_MAPPER).stream().findFirst();
+    }
+
+    public boolean deleteByKey(UUID board_id, UUID user_id)
+    {
+        String sql = """
+                DELETE FROM user_boards
+                WHERE user_id = :user_id
+                AND board_id = :board_id
+        """;
+
+        return namedParameterJdbcTemplate.update(sql,Map.of("user_id", user_id, "board_id", board_id)) > 0;
+    }
+
+    public boolean deleteByBoardId(UUID board_id)
+    {
+        String sql = """
+                DELETE FROM user_boards
+                WHERE board_id = :board_id
+        """;
+
+        return namedParameterJdbcTemplate.update(sql,Map.of("board_id", board_id)) > 0;
+    }
+
+    public boolean deleteByUserId(UUID user_id)
+    {
+        String sql = """
+                DELETE FROM user_boards
+                WHERE user_id = :user_id
+        """;
+
+        return namedParameterJdbcTemplate.update(sql,Map.of("user_id", user_id)) > 0;
+    }
+
+    public boolean updateRole(UserBoard userBoard)
+    {
+        String sql = """
+                UPDATE user_boards
+                SET role = :role
+                WHERE board_id = :board_id
+                AND user_id = :user_id
+                """;
+
+        int rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of(
+                "board_id", userBoard.board_id(),
+                "user_id", userBoard.user_id(),
+                "role", userBoard.role()
+        ));
+
+        return rowsAffected == 1;
+    }
+
+
 
     private static final RowMapper<UserBoard> USER_BOARD_ROW_MAPPER = (rs,rowNum)->
             new UserBoard(

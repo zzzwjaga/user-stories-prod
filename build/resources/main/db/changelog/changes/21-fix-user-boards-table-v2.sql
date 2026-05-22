@@ -1,7 +1,0 @@
-ALTER TABLE user_boards
-DROP COLUMN role_id;
-
-DROP TABLE roles CASCADE;
-
-ALTER TABLE user_boards
-ADD COLUMN role VARCHAR(50);
