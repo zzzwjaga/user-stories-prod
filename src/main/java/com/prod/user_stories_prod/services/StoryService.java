@@ -6,6 +6,7 @@ import com.prod.user_stories_prod.entities.StoryStatus;
 import com.prod.user_stories_prod.exseptions.ValidationException;
 import com.prod.user_stories_prod.repositories.BoardRepository;
 import com.prod.user_stories_prod.repositories.StoryStatusRepository;
+import com.prod.user_stories_prod.responses.PageResponce;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.prod.user_stories_prod.repositories.StoryRepository;
@@ -65,8 +66,28 @@ public class StoryService {
     }
 
     @Transactional
-    public List<Story> findAllByBoard (UUID board_id) {
-        return storyRepository.findAllByBoard(board_id);
+    public PageResponce<Story> findAllByBoard(
+            UUID board_id,
+            int page,
+            int size
+    )
+    {
+        List<Story> stories =
+                storyRepository.findAllByBoard(board_id, page, size);
+
+        long total =
+                storyRepository.countByBoard(board_id);
+
+        int totalPages =
+                (int) Math.ceil((double) total / size);
+
+        return new PageResponce<>(
+                stories,
+                page,
+                size,
+                total,
+                totalPages
+        );
     }
 
     @Transactional

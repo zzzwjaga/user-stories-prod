@@ -24,7 +24,7 @@ public class StoryController {
         this.storyTemplateService = storyTemplateService;
     }
 
-    @GetMapping("/boards/{board_id}/stories")
+    /*@GetMapping("/boards/{board_id}/stories")
     public ResponseEntity<List<Story>> getAllStories(@PathVariable UUID board_id) {
         List<Story> stories = storyService.findAllByBoard(board_id);
 
@@ -33,7 +33,7 @@ public class StoryController {
         }
 
         return ResponseEntity.ok(stories);  // 200 OK
-    }
+    }*/
 
     @GetMapping("/boards/{board_id}/stories/{number}")
     public ResponseEntity<Story>  getStoryByNumber(@PathVariable UUID board_id,@PathVariable String number)

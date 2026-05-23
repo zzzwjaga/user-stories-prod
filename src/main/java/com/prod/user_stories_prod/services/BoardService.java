@@ -6,6 +6,8 @@ import com.prod.user_stories_prod.repositories.BoardRepository;
 import com.prod.user_stories_prod.requests.CreateBoardRequest;
 import com.prod.user_stories_prod.requests.UpdateBoardRequest;
 import com.prod.user_stories_prod.responses.ErrorCode;
+import com.prod.user_stories_prod.responses.PageResponce;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,10 +48,14 @@ public class BoardService {
         return newBoard;
     }
 
+
     @Transactional
-    public List<Board> findAllBoards()
+    public PageResponce<Board> findAllBoards(int page, int pageSize)
     {
-        return boardRepository.findAll();
+        List<Board> boards = boardRepository.findAll(page, pageSize);
+        long total = boardRepository.countAll();
+        int totalPages = (int) Math.ceil((double) total / pageSize);
+        return new PageResponce<>(boards, page, pageSize, total, totalPages);
     }
 
     @Transactional
@@ -64,10 +70,12 @@ public class BoardService {
     }
 
     @Transactional
-    public List<Board> findBoardsByOwner(UUID owner_id)
+    public PageResponce<Board> findBoardsByOwner(UUID owner_id, int page, int pageSize)
     {
-        //добавить проверку существования овнера
-        return boardRepository.findByOwner(owner_id);
+        List<Board> boards = boardRepository.findByOwner(owner_id, page, pageSize);
+        long total = boardRepository.countAllByOwner(owner_id);
+        int totalPages = (int) Math.ceil((double) total / pageSize);
+        return new PageResponce<>(boards, page, pageSize, total, totalPages);
     }
 
     public Board updateBoard(UUID id, UpdateBoardRequest request)
@@ -89,6 +97,8 @@ public class BoardService {
         }
         return updatedBoard;
     }
+
+
 
     public  void deleteBoard(UUID id)
     {

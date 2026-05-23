@@ -39,6 +39,7 @@ public class InvestResultsRepository {
                 SELECT * FROM investresults
                 WHERE stories_id = :story_id
                 ORDER BY checked_at
+                
                 """;
 
         List<InvestResults> investResults = namedParameterJdbcTemplate.query(sql, Map.of("id", story_id), INVEST_RESULTS_ROW_MAPPER).stream().toList();

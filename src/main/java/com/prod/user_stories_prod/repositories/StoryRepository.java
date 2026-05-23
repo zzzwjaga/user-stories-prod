@@ -30,9 +30,21 @@ public class StoryRepository {
         return stories.stream().findFirst();
     }
 
-    public List<Story> findAllByBoard(UUID board_id) {
-        String sql = "SELECT * FROM stories WHERE board_id = :board_id;";
-        List<Story> stories = namedParameterJdbcTemplate.query(sql, Map.of("board_id", board_id), STORY_ROW_MAPPER);
+    public List<Story> findAllByBoard(UUID board_id, int page, int pageSize) {
+
+        int offset = page * pageSize;
+        String sql = """
+        SELECT *
+        FROM stories 
+        WHERE board_id = :board_id
+        ORDER BY number
+        LIMIT :pageSize 
+        OFFSET :offset
+        """;
+        List<Story> stories = namedParameterJdbcTemplate.query(sql, Map.of(
+                "board_id", board_id,
+                "limit", pageSize,
+                "offset", offset), STORY_ROW_MAPPER);
         if (stories.isEmpty()) {
             return List.of();
         }
@@ -94,7 +106,19 @@ public class StoryRepository {
         return rowsAffected > 0;
     }
 
+    public long countByBoard(UUID board_id) {
 
+        String sql = """
+        SELECT COUNT(*)
+        FROM stories
+        WHERE board_id = :board_id
+        """;
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                Map.of("board_id", board_id),
+                Long.class
+        );
+    }
 
     public void lockOnValue(Object value){
         String sql = "SELECT pg_advisory_xact_lock(hashtext(:lock));";

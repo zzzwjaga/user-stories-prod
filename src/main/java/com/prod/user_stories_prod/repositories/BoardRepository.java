@@ -1,6 +1,7 @@
 package com.prod.user_stories_prod.repositories;
 
 import com.prod.user_stories_prod.entities.Board;
+import org.springframework.boot.web.servlet.filter.OrderedFormContentFilter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -14,24 +15,42 @@ import java.util.UUID;
 public class BoardRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final OrderedFormContentFilter orderedFormContentFilter;
 
 
-    public BoardRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public BoardRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, OrderedFormContentFilter orderedFormContentFilter) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.orderedFormContentFilter = orderedFormContentFilter;
     }
 
-    public List<Board> findAll() {
-        String sql = "SELECT * FROM boards";
-        List<Board> boards = namedParameterJdbcTemplate.query(sql, Map.of(), BOARD_ROW_MAPPER);
+    public List<Board> findAll(int page, int pageSize) {
+        int offset = page * pageSize;
+
+        String sql = """
+            SELECT * 
+            FROM boards
+            ORDER BY boardname
+            LIMIT :pageSize
+            OFFSET :offset
+            """;
+        List<Board> boards = namedParameterJdbcTemplate.query(sql, Map.of("limit", pageSize, "offset", offset), BOARD_ROW_MAPPER);
         if(boards.isEmpty()) {
             return List.of();
         }
         return boards;
     }
 
-    public List<Board> findByOwner(UUID owner_id) {
-        String sql = "SELECT * FROM boards WHERE owner_id = :owner_id";
-        List<Board> boardsByOwner = namedParameterJdbcTemplate.query(sql, Map.of("owner_id", owner_id), BOARD_ROW_MAPPER);
+    public List<Board> findByOwner(UUID owner_id,  int page, int pageSize) {
+        int offset = page * pageSize;
+
+        String sql = """
+        SELECT * FROM boards 
+        WHERE owner_id = :owner_id
+        ORDER BY boardname
+        LIMIT :pageSize
+        OFFSET :offset
+        """;
+        List<Board> boardsByOwner = namedParameterJdbcTemplate.query(sql, Map.of("owner_id", owner_id, "limit", pageSize, "offset", offset), BOARD_ROW_MAPPER);
         if(boardsByOwner.isEmpty()) {
             return List.of();
         }
@@ -50,7 +69,6 @@ public class BoardRepository {
         return boards.stream().findFirst();
     }
 
-    //переписать под пользователя таблицы
     public Optional<Board> findByName(UUID owner_id, String boardname) {
         String sql = "SELECT * FROM boards WHERE owner_id = :owner_id AND boardname = :boardname";
         List<Board> boards = namedParameterJdbcTemplate.query(sql, Map.of(
@@ -119,6 +137,34 @@ public class BoardRepository {
 
         return namedParameterJdbcTemplate.queryForObject(sql, Map.of("board_id", board_id), Long.class);
     }
+
+    public long countAll() {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM boards
+        """;
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                Map.of(),
+                Long.class
+        );
+    }
+
+    public long countAllByOwner(UUID owner_id) {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM boards
+        WHERE owner_id = :owner_id
+        """;
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                Map.of("owner_id", owner_id),
+                Long.class
+        );
+    }
+
 
     public void lockOnValue(Object value){
         String sql = "SELECT pg_advisory_xact_lock(hashtext(:lock));";
