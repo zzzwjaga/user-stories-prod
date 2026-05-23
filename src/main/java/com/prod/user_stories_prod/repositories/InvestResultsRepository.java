@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,6 +31,18 @@ public class InvestResultsRepository {
 
         Optional<InvestResults> lastInvestResult = namedParameterJdbcTemplate.query(sql, Map.of("id", story_id), INVEST_RESULTS_ROW_MAPPER).stream().findFirst();
         return lastInvestResult;
+    }
+
+    public List<InvestResults> findAllById(UUID story_id)
+    {
+        String sql = """
+                SELECT * FROM investresults
+                WHERE stories_id = :story_id
+                ORDER BY checked_at
+                """;
+
+        List<InvestResults> investResults = namedParameterJdbcTemplate.query(sql, Map.of("id", story_id), INVEST_RESULTS_ROW_MAPPER).stream().toList();
+        return investResults;
     }
 
     public boolean createInvestResults(InvestResults investResults) {
