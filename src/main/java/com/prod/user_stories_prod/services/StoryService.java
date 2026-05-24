@@ -126,14 +126,23 @@ public class StoryService {
     }
 
     @Transactional
-    public List<StoryStatus> findAllStatuses(UUID story_id)
+    public PageResponce<StoryStatus> findAllStatuses(UUID story_id, int page, int pageSize)
     {
         Optional<Story> maybeStory = storyRepository.findById(story_id);
         if (maybeStory.isEmpty()) {
             throw new ValidationException(String.valueOf(ErrorCode.STORY_NOT_FOUND));
         }
-        List<StoryStatus> storyStatuses = storyStatusRepository.findAllById(story_id);
-        return storyStatuses;
+        List<StoryStatus> storyStatuses = storyStatusRepository.findAllById(story_id,page, pageSize);
+        long total = storyStatusRepository.countAllById(story_id);
+        int totalPages = (int)Math.ceil((double) total / pageSize);
+        return new PageResponce<>(
+                storyStatuses,
+                page,
+                pageSize,
+                total,
+                totalPages
+
+        );
     }
 
     @Transactional
@@ -156,8 +165,6 @@ public class StoryService {
             throw new ValidationException("Status could not be updated");
         }
     }
-
-
 
     @Transactional
     public void deleteStory(UUID id) {

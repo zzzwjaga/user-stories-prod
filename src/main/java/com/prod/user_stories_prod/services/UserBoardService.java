@@ -9,6 +9,7 @@ import com.prod.user_stories_prod.repositories.UserBoardRepository;
 import com.prod.user_stories_prod.repositories.UserRepository;
 import com.prod.user_stories_prod.responses.BoardRoleResponce;
 import com.prod.user_stories_prod.responses.ErrorCode;
+import com.prod.user_stories_prod.responses.PageResponce;
 import com.prod.user_stories_prod.responses.UserRoleResponce;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,39 +53,43 @@ public class UserBoardService {
     }
 
     @Transactional
-    public List<BoardRoleResponce> findByUserId(UUID user_id)
+    public PageResponce<UserBoard> findByUserId(UUID user_id, int page, int pageSize)
     {
         if(userRepository.findById(user_id).isEmpty())
         {
             throw new ValidationException(ErrorCode.USER_NOT_FOUND);
         }
 
-        List<UserBoard> links = userBoardRepository.findAllByUserId(user_id);
-
-        return links.stream()
-                .map(link -> new BoardRoleResponce(
-                        link.board_id(),
-                        link.role()
-                ))
-                .toList();
+        List<UserBoard> links = userBoardRepository.findAllByUserId(user_id, page, pageSize);
+        long total = userBoardRepository.countAllByUserId(user_id);
+        int totalPages = (int) Math.ceil((double)total/pageSize);
+        return new PageResponce<>(
+                links,
+                page,
+                pageSize,
+                total,
+                totalPages
+        );
     }
 
     @Transactional
-    public List<UserRoleResponce> findByBoardId(UUID board_id)
+    public PageResponce<UserBoard> findByBoardId(UUID board_id, int page, int pageSize)
     {
         if(boardRepository.findById(board_id).isEmpty())
         {
             throw new ValidationException(ErrorCode.BOARD_NOT_FOUND);
         }
 
-        List<UserBoard> links = userBoardRepository.findAllByBoardId(board_id);
-
-        return links.stream()
-                .map(link -> new UserRoleResponce(
-                        link.user_id(),
-                        link.role()
-                ))
-                .toList();
+        List<UserBoard> links = userBoardRepository.findAllByBoardId(board_id,page, pageSize);
+        long total = userBoardRepository.countAllByBoardId(board_id);
+        int totalPages = (int) Math.ceil((double)total/pageSize);
+        return new PageResponce<>(
+                links,
+                page,
+                pageSize,
+                total,
+                totalPages
+        );
     }
 
     @Transactional

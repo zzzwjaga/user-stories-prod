@@ -33,16 +33,21 @@ public class InvestResultsRepository {
         return lastInvestResult;
     }
 
-    public List<InvestResults> findAllById(UUID story_id)
+    public List<InvestResults> findAllById(UUID story_id, int page, int pageSize)
     {
+        int offset = page * pageSize;
         String sql = """
                 SELECT * FROM investresults
                 WHERE stories_id = :story_id
                 ORDER BY checked_at
-                
+                LIMIT :pageSize
+                OFFSET :offset
                 """;
-
-        List<InvestResults> investResults = namedParameterJdbcTemplate.query(sql, Map.of("id", story_id), INVEST_RESULTS_ROW_MAPPER).stream().toList();
+        List<InvestResults> investResults = namedParameterJdbcTemplate.query(sql, Map.of(
+                "id", story_id,
+                "limit", pageSize,
+                "offset", offset
+        ), INVEST_RESULTS_ROW_MAPPER).stream().toList();
         return investResults;
     }
 
@@ -87,6 +92,20 @@ public class InvestResultsRepository {
         Map<String, Object> params = Map.of("story_id", story_id, "checked_at", checked_at);
         int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
         return rowsAffected == 1;
+    }
+
+    public long countAllById(UUID story_id) {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM investresults
+        WHERE stories_id = :story_id
+        """;
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                Map.of(),
+                Long.class
+        );
     }
 
     private static final RowMapper<InvestResults> INVEST_RESULTS_ROW_MAPPER = (rs, rowNum) -> new InvestResults(

@@ -52,13 +52,32 @@ public class UserRepository {
         return  users.stream().findFirst();
     }
 
-    public List<User> findAll() {
+    public List<User> findAll(int page, int pageSize) {
+       int offset = page * pageSize;
         String sql = """
                 SELECT username, email
                 FROM users
                 ORDER BY username ASC
+                LIMIT :limit
+                OFFSET :offset
         """;
-        return  namedParameterJdbcTemplate.query(sql, USER_ROW_MAPPER);
+        return  namedParameterJdbcTemplate.query(sql, Map.of(
+                "limit", pageSize,
+                "offset", offset),
+                USER_ROW_MAPPER);
+    }
+
+    public long countAll() {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM users
+        """;
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                Map.of(),
+                Long.class
+        );
     }
 
 

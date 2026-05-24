@@ -98,8 +98,6 @@ public class BoardService {
         return updatedBoard;
     }
 
-
-
     public  void deleteBoard(UUID id)
     {
         Optional<Board> maybeBoard = boardRepository.findById(id);

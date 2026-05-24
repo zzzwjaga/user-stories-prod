@@ -7,6 +7,8 @@ import com.prod.user_stories_prod.repositories.InvestResultsRepository;
 import com.prod.user_stories_prod.repositories.StoryRepository;
 import com.prod.user_stories_prod.responses.ErrorCode;
 import com.prod.user_stories_prod.responses.InvestCheckResponce;
+import com.prod.user_stories_prod.responses.PageResponce;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,14 +75,23 @@ public class InvestResultsService {
         return investResults.get();
     }
 
+
     @Transactional
-    public List<InvestResults> findInvestResultsByStoryId(UUID story_id) {
+    PageResponce<InvestResults> findInvestResultsByStoryId(UUID story_id, int page, int pageSize) {
         Optional<Story> story = storyRepository.findById(story_id);
         if (story.isEmpty()) {
             throw new ValidationException(ErrorCode.STORY_NOT_FOUND);
         }
-        List<InvestResults> results = investResultsRepository.findAllById(story_id);
-        return results;
+        List<InvestResults> results = investResultsRepository.findAllById(story_id, page, pageSize);
+        long total = investResultsRepository.countAllById(story_id);
+        int totalPages = (int) Math.ceil((double) total/pageSize);
+        return new PageResponce<>(
+                results,
+                page,
+                pageSize,
+                total,
+                totalPages
+        );
     }
 
     @Transactional

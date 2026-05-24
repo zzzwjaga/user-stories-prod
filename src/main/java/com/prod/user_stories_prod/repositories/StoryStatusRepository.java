@@ -35,15 +35,23 @@ public class StoryStatusRepository {
         return rowsAffected > 0;
     }
 
-    public List<StoryStatus> findAllById(UUID story_id)
+    public List<StoryStatus> findAllById(UUID story_id, int page, int pageSize)
     {
+        int offset = page * pageSize;
         String sql = """
                 SELECT *
                 FROM stories_statuses
                 WHERE story_id = :story_id
-                ORDER BY changed_at""";
+                ORDER BY changed_at
+                LIMIT :limit
+                OFFSET :offset
+                """;
 
-        return namedParameterJdbcTemplate.query(sql,Map.of("story_id", story_id), STORY_STATUS_ROW_MAPPER);
+        return namedParameterJdbcTemplate.query(sql,Map.of(
+                "story_id", story_id,
+                "limit", pageSize,
+                "offset", offset
+        ), STORY_STATUS_ROW_MAPPER);
     }
 
     public Optional<StoryStatus> findLatestById(UUID story_id)
@@ -68,6 +76,21 @@ public class StoryStatusRepository {
         """;
 
         return namedParameterJdbcTemplate.query(sql, Map.of("id", id), STORY_STATUS_ROW_MAPPER).stream().findFirst();
+    }
+
+    public long countAllById(UUID story_id) {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM stories_statuses
+        WHERE story_id = :story_id
+        
+        """;
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                Map.of(),
+                Long.class
+        );
     }
 
     public boolean deleteRecordById(UUID id)

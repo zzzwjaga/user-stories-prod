@@ -35,23 +35,65 @@ public class UserBoardRepository {
         return rowsAffected > 0;
     }
 
-    public List<UserBoard> findAllByUserId(UUID user_id)
+    public List<UserBoard> findAllByUserId(UUID user_id, int page, int pageSize)
     {
+        int offset = page * pageSize;
         String sql = """
                 SELECT *  FROM user_boards
                 WHERE user_id = :user_id
+                LIMIT :limit
+                OFFSET :offset
                 """;
 
-        return namedParameterJdbcTemplate.query(sql,Map.of("user_id", user_id), USER_BOARD_ROW_MAPPER);
+        return namedParameterJdbcTemplate.query(sql,Map.of(
+                "user_id", user_id,
+                "limit", pageSize,
+                "offset", offset
+        ), USER_BOARD_ROW_MAPPER);
     }
 
-    public List<UserBoard> findAllByBoardId(UUID board_id)
+    public long countAllByUserId(UUID user_id) {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM user_boards
+        WHERE user_id = :user_id
+        """;
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                Map.of(),
+                Long.class
+        );
+    }
+
+    public List<UserBoard> findAllByBoardId(UUID board_id, int page, int pageSize)
     {
+        int offset = page * pageSize;
         String sql = """
                 SELECT *  FROM user_boards
                 WHERE board_id = :board_id
+                LIMIT :limit
+                OFFSET :offset
         """;
-        return namedParameterJdbcTemplate.query(sql,Map.of("board_id", board_id), USER_BOARD_ROW_MAPPER);
+        return namedParameterJdbcTemplate.query(sql,Map.of(
+                "board_id", board_id,
+                "limit", pageSize,
+                "offset", offset
+        ), USER_BOARD_ROW_MAPPER);
+    }
+
+    public long countAllByBoardId(UUID board_id) {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM user_boards
+        WHERE board_id = :board_id
+        """;
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                Map.of(),
+                Long.class
+        );
     }
 
     public Optional<UserBoard> findByKey(UUID board_id, UUID user_id)

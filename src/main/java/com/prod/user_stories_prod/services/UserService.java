@@ -6,6 +6,7 @@ import com.prod.user_stories_prod.repositories.UserRepository;
 import com.prod.user_stories_prod.requests.CreateUserRequest;
 import com.prod.user_stories_prod.requests.UpdateUserRequest;
 import com.prod.user_stories_prod.responses.ErrorCode;
+import com.prod.user_stories_prod.responses.PageResponce;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,9 +92,12 @@ public class UserService {
     }
 
     @Transactional
-    public List<User> findAll()
+    public PageResponce<User> findAll(int page, int pageSize)
     {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll(page, pageSize);
+        long total = userRepository.countAll();
+        int totalPages = (int) Math.ceil(total/(double)pageSize);
+        return new PageResponce<>(users, page, pageSize, total, totalPages);
     }
 
     @Transactional
