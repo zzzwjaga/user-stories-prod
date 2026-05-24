@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.prod.user_stories_prod.services.StoryService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -38,7 +39,7 @@ public class StoryController {
     @GetMapping("/boards/{board_id}/stories/{number}")
     public ResponseEntity<Story>  getStoryByNumber(@PathVariable UUID board_id,@PathVariable String number)
     {
-        Story story = storyService.findStoryByNumber(board_id, number);
+       Story story = storyService.findStoryByNumber(board_id, number).get();
         if(story == null) {
             return ResponseEntity.noContent().build();
         }

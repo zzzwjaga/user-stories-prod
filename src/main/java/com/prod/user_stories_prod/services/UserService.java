@@ -5,8 +5,9 @@ import com.prod.user_stories_prod.exseptions.ValidationException;
 import com.prod.user_stories_prod.repositories.UserRepository;
 import com.prod.user_stories_prod.requests.CreateUserRequest;
 import com.prod.user_stories_prod.requests.UpdateUserRequest;
-import com.prod.user_stories_prod.responses.ErrorCode;
 import com.prod.user_stories_prod.responses.PageResponce;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private static final Logger log =
+            LoggerFactory.getLogger(UserService.class);
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -34,15 +37,18 @@ public class UserService {
     {
         userRepository.lockOnValue(request.username());
         userRepository.lockOnValue(request.email());
-
+        log.debug("Lock acquired for username={} email={}",
+                request.username(), request.email());
         Optional<User> maybeUser = userRepository.findByUsername(request.username());
         if(maybeUser.isPresent())
         {
+            log.warn("Username already exists username={}", request.username());
             throw new ValidationException(USER_ALREADY_EXISTS);
         }
         maybeUser =  userRepository.findByEmail(request.email());
         if(maybeUser.isPresent())
         {
+            log.warn("Email already exists email={}", request.email());
             throw new ValidationException(USER_ALREADY_EXISTS);
         }
 
@@ -55,6 +61,7 @@ public class UserService {
         );
         if(!userRepository.createUser(newUser))
         {
+            log.error("Failed to create user username={}", request.username());
             throw new ValidationException("User could not be created");
         }
         return newUser;
@@ -66,8 +73,10 @@ public class UserService {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty())
         {
+            log.warn("User not found id={}", id);
            throw new ValidationException(USER_NOT_FOUND);
         }
+        log.info("User found id={}", id);
         return user.get();
     }
 
@@ -76,6 +85,7 @@ public class UserService {
         Optional<User> user = userRepository.findByUsername(username);
         if(user.isEmpty())
         {
+            log.warn("User not found username={}", username);
            throw new ValidationException(USER_NOT_FOUND);
         }
         return user.get();
@@ -86,6 +96,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isEmpty())
         {
+            log.warn("User not found email={}", email);
            throw new ValidationException(USER_NOT_FOUND);
         }
         return user.get();
@@ -97,6 +108,7 @@ public class UserService {
         List<User> users = userRepository.findAll(page, pageSize);
         long total = userRepository.countAll();
         int totalPages = (int) Math.ceil(total/(double)pageSize);
+        log.info("Fetched users count={}", users.size());
         return new PageResponce<>(users, page, pageSize, total, totalPages);
     }
 
@@ -106,6 +118,7 @@ public class UserService {
         Optional<User> existingUser = userRepository.findById(id);
         if(existingUser.isEmpty())
         {
+            log.warn("User not found id={}", id);
             throw new ValidationException(USER_NOT_FOUND);
         }
         User updatedUser = new User(
@@ -116,8 +129,12 @@ public class UserService {
         );
         if(!userRepository.updateUser(updatedUser))
         {
+            log.info("User updated id={} username={}",
+                    id, request.username());
             throw new ValidationException("User could not be updated");
         }
+        log.info("User updated id={} username={}",
+                id, request.username());
         return updatedUser;
     }
 
@@ -127,10 +144,12 @@ public class UserService {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty())
         {
+            log.warn("User not found id={}", id);
             throw new ValidationException(USER_NOT_FOUND);
         }
         if(!userRepository.deleteUser(id))
         {
+            log.error("Failed to delete user id={}", id);
             throw new ValidationException("User could not be deleted");
         }
     }

@@ -2,18 +2,23 @@ package com.prod.user_stories_prod.services;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prod.user_stories_prod.exseptions.ValidationException;
+import com.prod.user_stories_prod.responses.ErrorCode;
 import com.prod.user_stories_prod.responses.InvestCheckResponce;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class AIService {
 
     private final OpenAiChatModel chatModel;
     private final ObjectMapper objectMapper;
-
+    private static final Logger log = LoggerFactory.getLogger(AIService.class);
 
     public AIService(OpenAiChatModel chatModel, ObjectMapper objectMapper) {
         this.chatModel = chatModel;
@@ -21,17 +26,21 @@ public class AIService {
     }
 
     public InvestCheckResponce investCheck(String story_text) {
+
+        if(story_text == null || story_text.isBlank()) {
+            log.error("Empty story_text provided to AI");
+            throw new ValidationException(ErrorCode.STORY_TEXT_IS_EMPTY);
+        }
         String prompt = buildPrompt(story_text);
 
         try {
             ChatResponse response = chatModel.call(new Prompt(prompt));
             String content = response.getResult().getOutput().getText();
-
+            log.info("Invest check response: {}", content);
             String jsonContent = extractJson(content);
-
             return objectMapper.readValue(jsonContent, InvestCheckResponce.class);
         } catch (Exception e) {
-            System.err.println("Error calling AI: " + e.getMessage());
+            log.error("AI investCheck failed for story_text={}", story_text, e);
             return new InvestCheckResponce(0, 0, 0, 0, 0, 0,
                     "Ошибка при вызове AI: " + e.getMessage(),
                     "Проверьте подключение к DeepSeek API");
