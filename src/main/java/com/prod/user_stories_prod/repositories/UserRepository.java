@@ -83,15 +83,15 @@ public class UserRepository {
 
     public boolean createUser(User user) {
         String sql = """
-                INSERT INTO users(id, username, email, password_hash, created_at, updated_at)
-                VALUES (:id, :username, :email, :passwordHash, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                INSERT INTO users(id, username, email, password_hash, created_at, updated_at, version)
+                VALUES (:id, :username, :email, :passwordHash, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
         """;
         Map<String,Object> params = Map.of(
                 "id", user.id(),
                 "username", user.username(),
                 "email", user.email(),
                 "passowrd_hash", user.password_hash()
-        );
+                        );
         int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
         return rowsAffected > 0;
     }
@@ -101,13 +101,15 @@ public class UserRepository {
                 UPDATE users
                 SET username = :username,
                 email = :email,
+                version = :version + 1,
                 updated_at = CURRENT_TIMESTAMP
+                WHERE id = :id AND version = :version
         """;
         Map<String,Object> params = Map.of(
                 "id", user.id(),
                 "username", user.username(),
                 "email", user.email(),
-                "password_hash", user.password_hash()
+                "version", user.version()
         );
         int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
         return rowsAffected > 0;
@@ -132,6 +134,7 @@ public class UserRepository {
             rs.getString("email"),
             rs.getString("password_hash"),
             rs.getTimestamp("created_at"),
-            rs.getTimestamp("updated_at")
+            rs.getTimestamp("updated_at"),
+            rs.getLong("version")
     );
 }

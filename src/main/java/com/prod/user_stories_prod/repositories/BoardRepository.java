@@ -69,6 +69,22 @@ public class BoardRepository {
         return boards.stream().findFirst();
     }
 
+    public Optional<Board> findByIdForUpdate(UUID id)
+    {
+        String sql = """
+        SELECT *
+        FROM boards
+        WHERE id = :id
+        FOR UPDATE
+    """;
+
+        return namedParameterJdbcTemplate.query(
+                sql,
+                Map.of("id", id),
+                BOARD_ROW_MAPPER
+        ).stream().findFirst();
+    }
+
     public Optional<Board> findByName(UUID owner_id, String boardname) {
         String sql = "SELECT * FROM boards WHERE owner_id = :owner_id AND boardname = :boardname";
         List<Board> boards = namedParameterJdbcTemplate.query(sql, Map.of(
@@ -86,8 +102,8 @@ public class BoardRepository {
 
     public boolean createBoard(Board board) {
         String sql = """
-         INSERT INTO boards (id, owner_id, boardname, description, created_at, updated_at)
-         VALUES (:id, :owner_id, :boardname, :description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+         INSERT INTO boards (id, owner_id, boardname, description, created_at, updated_at, version)
+         VALUES (:id, :owner_id, :boardname, :description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
          """;
 
         Map<String, Object> params = Map.of(
@@ -105,8 +121,9 @@ public class BoardRepository {
         UPDATE boards
             SET boardname = :boardname,
             description = :description,
+            version = :version+1, 
             updated_at = CURRENT_TIMESTAMP
-        WHERE id = :id
+        WHERE id = :id AND version = :version;
         """;
         int  rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of(
                 "id", board.id(),
@@ -114,7 +131,8 @@ public class BoardRepository {
                 "boardname", board.boardname(),
                 "description", board.description(),
                 "created_at",  board.created_at(),
-                "updated_at", board.updated_at()
+                "updated_at", board.updated_at(),
+                "version", board.version()
         ));
         return rowsAffected == 1;
     }
@@ -177,6 +195,7 @@ public class BoardRepository {
             rs.getString("boardname"),
             rs.getString("description"),
             rs.getTimestamp("created_at"),
-            rs.getTimestamp("updated_at")
+            rs.getTimestamp("updated_at"),
+            rs.getLong("version")
     );
 }

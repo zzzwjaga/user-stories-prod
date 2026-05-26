@@ -58,10 +58,26 @@ public class StoryRepository {
                 .findFirst();
     }
 
+    public Optional<Story> findByIdForUpdate(UUID id)
+    {
+        String sql = """
+        SELECT *
+        FROM stories
+        WHERE id = :id
+        FOR UPDATE
+    """;
+
+        return namedParameterJdbcTemplate.query(
+                sql,
+                Map.of("id", id),
+                STORY_ROW_MAPPER
+        ).stream().findFirst();
+    }
+
     public boolean createStory(Story story) {
         String sql = """
-        INSERT INTO stories (id, number, story_text, story_points, board_id, author_id, created_at, updated_at)
-        VALUES (:id, :number, :story_text, :story_points, :board_id, :author_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO stories (id, number, story_text, story_points, board_id, author_id, created_at, updated_at, version)
+        VALUES (:id, :number, :story_text, :story_points, :board_id, :author_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
         """;
         Map<String, Object> params = Map.of(
                 "id", story.id(),
@@ -82,8 +98,9 @@ public class StoryRepository {
         SET 
             story_text = :story_text,
             story_points = :story_points,
+            version = version + 1,
             updated_at = CURRENT_TIMESTAMP
-        WHERE id = :id
+        WHERE id = :id AND version = :version
         """;
         int rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of(
                 "id", story.id(),
@@ -91,7 +108,8 @@ public class StoryRepository {
                 "story_text", story.story_text(),
                 "story_points", story.story_points(),
                 "board_id", story.board_id(),
-                "author_id", story.author_id()
+                "author_id", story.author_id(),
+                "version", story.version()
         ));
         return rowsAffected == 1;
     }
@@ -133,7 +151,8 @@ public class StoryRepository {
             rs.getObject("board_id", UUID.class),
             rs.getObject("author_id", UUID.class),
             rs.getTimestamp("created_at"),
-            rs.getTimestamp("updated_at")
+            rs.getTimestamp("updated_at"),
+            rs.getLong("version")
     );
     }
 

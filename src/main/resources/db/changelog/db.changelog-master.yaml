@@ -37,5 +37,11 @@ databaseChangeLog:
       file: db/changelog/changes/18-fix-story-statuses.sql
   - include:
       file: db/changelog/changes/19-fix-user-boards-table.sql
+  - include:
+      file: db/changelog/changes/20-add-story-version.sql
+  - include:
+      file: db/changelog/changes/21-add-board-version.sql
+  - include:
+      file: db/changelog/changes/22-add-user-version.sql
 
 

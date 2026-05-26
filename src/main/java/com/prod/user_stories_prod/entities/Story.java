@@ -10,9 +10,10 @@ public record Story(UUID id,
                     UUID board_id,
                     UUID author_id,
                     Timestamp created_at,
-                    Timestamp updated_at ) {
+                    Timestamp updated_at,
+                    Long version) {
     public Story(UUID id, String number, int story_points, String story_text, UUID board_id, UUID author_id) {
-        this(id, number, story_text, story_points, board_id, author_id, null, null);
+        this(id, number, story_text, story_points, board_id, author_id, null, null, null);
     }
 }
 

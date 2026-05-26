@@ -40,7 +40,7 @@ public class StoryService {
 
     @Transactional
     public Story createStory(UUID board_id, CreateStoryRequest request) {
-        if(boardRepository.findById(board_id).isEmpty()) {
+        if(boardRepository.findByIdForUpdate(board_id).isEmpty()) {
             log.warn("Board not found boardId={}", board_id);
             throw new ValidationException(ErrorCode.BOARD_NOT_FOUND);
         }
@@ -177,7 +177,7 @@ public class StoryService {
     @Transactional
     public void changeStatus(UUID story_id, Status newStatus)
     {
-        Optional<Story> story = storyRepository.findById(story_id);
+        Optional<Story> story = storyRepository.findByIdForUpdate(story_id);
 
         if (story.isEmpty()) {
             log.warn("Story not found storyId={}", story_id);

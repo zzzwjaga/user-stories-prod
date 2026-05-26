@@ -15,11 +15,12 @@ public record User(
         String email,
         String password_hash,
         Timestamp created_at,
-        Timestamp updated_at
+        Timestamp updated_at,
+        Long version
 ) implements UserDetails {
 
     public User(UUID id, String username, String email, String password_hash) {
-        this(id,username,email,password_hash, null, null);
+        this(id,username,email,password_hash, null, null, null);
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
