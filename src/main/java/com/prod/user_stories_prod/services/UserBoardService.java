@@ -162,7 +162,8 @@ public class UserBoardService {
         return true;
     }
 
-    @Transactional boolean updateRole(UUID board_id, UUID user_id, Role role)
+    @Transactional
+    public boolean updateRole(UUID board_id, UUID user_id, Role role)
     {
         if(userRepository.findById(user_id).isEmpty())
         {

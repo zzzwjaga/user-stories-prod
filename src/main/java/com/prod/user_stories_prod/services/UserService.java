@@ -129,7 +129,7 @@ public class UserService {
         );
         if(!userRepository.updateUser(updatedUser))
         {
-            log.info("User updated id={} username={}",
+            log.error("User don't updated id={} username={}",
                     id, request.username());
             throw new ValidationException("User could not be updated");
         }

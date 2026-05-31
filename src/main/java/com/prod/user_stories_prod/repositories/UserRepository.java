@@ -19,7 +19,7 @@ public class UserRepository {
 
     public Optional<User> findById(UUID id) {
         String sql = """
-                SELECT username, email
+                SELECT *
                 FROM users
                 WHERE id = :id
                 """;
@@ -28,7 +28,7 @@ public class UserRepository {
 
     public Optional<User> findByUsername(String username) {
         String sql = """
-                SELECT username, email
+                SELECT *
                 FROM users
                 WHERE username = :username
         """;
@@ -41,7 +41,7 @@ public class UserRepository {
 
     public Optional<User> findByEmail(String email) {
         String sql = """
-                SELECT username, email
+                SELECT *
                 FROM users
                 WHERE email = :email
         """;
@@ -55,7 +55,7 @@ public class UserRepository {
     public List<User> findAll(int page, int pageSize) {
        int offset = page * pageSize;
         String sql = """
-                SELECT username, email
+                SELECT *
                 FROM users
                 ORDER BY username ASC
                 LIMIT :limit
@@ -84,7 +84,7 @@ public class UserRepository {
     public boolean createUser(User user) {
         String sql = """
                 INSERT INTO users(id, username, email, password_hash, created_at, updated_at, version)
-                VALUES (:id, :username, :email, :passwordHash, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+                VALUES (:id, :username, :email, :password_hash, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
         """;
         Map<String,Object> params = Map.of(
                 "id", user.id(),

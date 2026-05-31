@@ -1,7 +1,7 @@
 plugins {
 	java
 	war
-	id("org.springframework.boot") version "3.2.0"
+	id("org.springframework.boot") version "3.2.5"
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -32,7 +32,7 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6")
+	implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6") 
 }
 
 tasks.withType<Test> {

@@ -61,7 +61,7 @@ public class UserBoardRepository {
         """;
         return namedParameterJdbcTemplate.queryForObject(
                 sql,
-                Map.of(),
+                Map.of("user_id", user_id),
                 Long.class
         );
     }
@@ -91,7 +91,7 @@ public class UserBoardRepository {
         """;
         return namedParameterJdbcTemplate.queryForObject(
                 sql,
-                Map.of(),
+                Map.of("board_id", board_id),
                 Long.class
         );
     }

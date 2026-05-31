@@ -1,20 +1,25 @@
 package com.prod.user_stories_prod.controllers;
 
+import com.prod.user_stories_prod.entities.Status;
 import com.prod.user_stories_prod.entities.Story;
+import com.prod.user_stories_prod.entities.StoryStatus;
 import com.prod.user_stories_prod.requests.CreateStoryRequest;
 import com.prod.user_stories_prod.requests.UpdateStoryRequest;
+import com.prod.user_stories_prod.responses.PageResponce;
 import com.prod.user_stories_prod.services.StoryTemplateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.prod.user_stories_prod.services.StoryService;
 
+import javax.naming.ldap.PagedResultsResponseControl;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api")
 public class StoryController {
 
     private final StoryService storyService;
@@ -25,31 +30,48 @@ public class StoryController {
         this.storyTemplateService = storyTemplateService;
     }
 
-    /*@GetMapping("/boards/{board_id}/stories")
-    public ResponseEntity<List<Story>> getAllStories(@PathVariable UUID board_id) {
-        List<Story> stories = storyService.findAllByBoard(board_id);
+    @GetMapping("/stories/template")
+    public ResponseEntity<String> getStoriesTemplate() {
+        String template = storyTemplateService.getTemplate();
+        return ResponseEntity.ok(template);
+    }
 
-        if (stories.isEmpty()) {
-            return ResponseEntity.noContent().build();  // 204 No Content
-        }
+    @GetMapping("/boards/{board_id}/stories")
+    public ResponseEntity<PageResponce<Story>> getAllStories(@PathVariable UUID board_id,
+                                                             @RequestParam(defaultValue = "0") Integer page,
+                                                             @RequestParam(defaultValue = "15") Integer size) {
+        PageResponce<Story> stories = storyService.findAllByBoard(board_id, page, size);
+        return ResponseEntity.ok(stories);
 
-        return ResponseEntity.ok(stories);  // 200 OK
-    }*/
+    }
 
     @GetMapping("/boards/{board_id}/stories/{number}")
     public ResponseEntity<Story>  getStoryByNumber(@PathVariable UUID board_id,@PathVariable String number)
     {
-       Story story = storyService.findStoryByNumber(board_id, number).get();
-        if(story == null) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(story);
+       Optional<Story> story = storyService.findStoryByNumber(board_id, number);
+       return ResponseEntity.ok(story.get());
     }
 
-    @GetMapping("/template")
-    public String getTemplate()
-    {
-        return storyTemplateService.getTemplate();
+    @GetMapping("/stories/{story_id}")
+    public ResponseEntity<Story> getStoryById(@PathVariable UUID story_id){
+        Optional<Story> story = storyService.findStoryById(story_id);
+        return ResponseEntity.ok(story.get());
+    }
+
+    @GetMapping("/stories/{story_id}/statuses")
+     ResponseEntity<PageResponce<StoryStatus>> getAllStatuses(
+            @PathVariable UUID story_id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PageResponce<StoryStatus> statuses = storyService.findAllStatuses(story_id, page, size);
+        return ResponseEntity.ok(statuses);
+    }
+
+    @GetMapping("/stories/{story_id}/statuses/latest")
+    public ResponseEntity<StoryStatus> getLatestStatus(@PathVariable UUID story_id) {
+        StoryStatus latestStatus = storyService.findLatestStatus(story_id);
+        return ResponseEntity.ok(latestStatus);
     }
 
     @PostMapping("/boards/{board_id}/stories")
@@ -57,7 +79,9 @@ public class StoryController {
             @PathVariable UUID board_id,
             @RequestBody CreateStoryRequest request) {
         Story created = storyService.createStory(board_id, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        URI location = URI.create(String.format("/api/boards/%s/stories/%s",
+                board_id, created.number()));
+        return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created);
     }
 
     @PutMapping("/stories/{story_id}")
@@ -69,10 +93,18 @@ public class StoryController {
         return ResponseEntity.ok(updated);
     }
 
+    @PatchMapping("/stories/{story_id}/status")
+    public ResponseEntity<Void> changeStatus(
+            @PathVariable UUID story_id,
+            @RequestParam String status) {
+
+        storyService.changeStatus(story_id, Status.valueOf(status));
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/stories/{story_id}")
     public ResponseEntity<Story> deleteStory(
-            @PathVariable UUID story_id
-    ){
+            @PathVariable UUID story_id) {
        storyService.deleteStory(story_id);
        return ResponseEntity.noContent().build();
     }
