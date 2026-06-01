@@ -90,7 +90,7 @@ public class UserRepository {
                 "id", user.id(),
                 "username", user.username(),
                 "email", user.email(),
-                "passowrd_hash", user.password_hash()
+                "password_hash", user.password_hash()
                         );
         int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
         return rowsAffected > 0;

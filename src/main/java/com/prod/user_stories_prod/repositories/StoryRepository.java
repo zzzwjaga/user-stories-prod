@@ -38,7 +38,7 @@ public class StoryRepository {
         FROM stories 
         WHERE board_id = :board_id
         ORDER BY number
-        LIMIT :pageSize 
+        LIMIT :limit
         OFFSET :offset
         """;
         List<Story> stories = namedParameterJdbcTemplate.query(sql, Map.of(
@@ -104,11 +104,8 @@ public class StoryRepository {
         """;
         int rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of(
                 "id", story.id(),
-                "number", story.number(),
                 "story_text", story.story_text(),
                 "story_points", story.story_points(),
-                "board_id", story.board_id(),
-                "author_id", story.author_id(),
                 "version", story.version()
         ));
         return rowsAffected == 1;

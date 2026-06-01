@@ -32,7 +32,7 @@ public class BoardController {
     }
 
     @GetMapping("/boards/{board_id}")
-    public ResponseEntity<Board> getBoard(@PathVariable UUID board_id){
+    public ResponseEntity<Board> getBoardById(@PathVariable UUID board_id){
         Optional<Board> board = boardService.findBoardById(board_id);
         return ResponseEntity.ok(board.get());
     }

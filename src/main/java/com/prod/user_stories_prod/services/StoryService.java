@@ -127,12 +127,20 @@ public class StoryService {
             log.warn("Story not found storyId={}", story_id);
             throw new ValidationException(String.valueOf(ErrorCode.STORY_NOT_FOUND));
         }
-        Story updatedStory = new Story(existingStory.get().id(),
+
+        String newText = request.story_text() !=null ? request.story_text() : existingStory.get().story_text();
+        Integer newStoryPoints = request.story_points() != null ? request.story_points() : existingStory.get().story_points();
+        Story updatedStory = new Story(
+                existingStory.get().id(),
                 existingStory.get().number(),
-                request.story_points(),
-                request.story_text(),
+                newText,
+                newStoryPoints,
                 existingStory.get().board_id(),
-                existingStory.get().author_id());
+                existingStory.get().author_id(),
+                existingStory.get().created_at(),
+                null,
+                existingStory.get().version());
+
 
         if(!storyRepository.updateStory(updatedStory))
         {

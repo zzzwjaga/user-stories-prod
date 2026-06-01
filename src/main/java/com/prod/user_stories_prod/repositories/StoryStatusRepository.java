@@ -28,7 +28,7 @@ public class StoryStatusRepository {
         Map<String, Object> params = Map.of(
                 "id", storyStatus.id(),
                 "story_id", storyStatus.story_id(),
-                "status", storyStatus.status()
+                "status", storyStatus.status().name()
         );
 
         int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
@@ -88,7 +88,7 @@ public class StoryStatusRepository {
         """;
         return namedParameterJdbcTemplate.queryForObject(
                 sql,
-                Map.of(),
+                Map.of("story_id", story_id),
                 Long.class
         );
     }
@@ -117,7 +117,7 @@ public class StoryStatusRepository {
             new StoryStatus(
                     rs.getObject("id", UUID.class),
                     rs.getObject("story_id", UUID.class),
-                    rs.getObject("status", Status.class),
+                    Status.valueOf(rs.getString("status")),
                     rs.getTimestamp("changed_at")
             );
 

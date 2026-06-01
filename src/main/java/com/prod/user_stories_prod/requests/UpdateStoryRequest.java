@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public record UpdateStoryRequest(
         String story_text,
-        int story_points
+        Integer story_points
 ) {
 }

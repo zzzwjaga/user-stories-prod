@@ -38,6 +38,7 @@ public class BoardService {
     @Transactional
     public Board createBoard(CreateBoardRequest request)
     {
+        log.info("owner id = {}", request.owner_id());
         boardRepository.lockOnValue(request.boardname());
         Optional<Board> maybeBoard = boardRepository.findByName(request.owner_id(),  request.boardname());
         if(maybeBoard.isPresent())
@@ -53,6 +54,7 @@ public class BoardService {
                 request.boardname(),
                 request.description()
         );
+        log.info("new board owner id = {}", newBoard.owner_id());
         if(!boardRepository.createBoard(newBoard))
         {
             log.error("Failed to create board name={} ownerId={}",
@@ -89,39 +91,46 @@ public class BoardService {
     }
 
     @Transactional
-    public PageResponce<Board> findBoardsByOwner(UUID owner_id, int page, int pageSize)
+    public PageResponce<Board> findBoardsByOwner(UUID owner_id, int page, int size)
     {
         if(userRepository.findById(owner_id).isEmpty()){
             log.warn("Owner not found id={}", owner_id);
             throw new ValidationException(USER_NOT_FOUND);
         }
-        List<Board> boards = boardRepository.findByOwner(owner_id, page, pageSize);
+        List<Board> boards = boardRepository.findByOwner(owner_id, page, size);
         long total = boardRepository.countAllByOwner(owner_id);
-        int totalPages = (int) Math.ceil((double) total / pageSize);
+        int totalPages = (int) Math.ceil((double) total / size);
         log.info("Fetched boards for owner ownerId={} count={}",
                 owner_id, boards.size());
-        return new PageResponce<>(boards, page, pageSize, total, totalPages);
+        return new PageResponce<>(boards, page, size, total, totalPages);
     }
 
-    public Board updateBoard(UUID id, UpdateBoardRequest request)
-    {
+    public Board updateBoard(UUID id, UpdateBoardRequest request) {
         Optional<Board> existingBoard = boardRepository.findById(id);
-        if(existingBoard.isEmpty())
-        {
+        if (existingBoard.isEmpty()) {
             log.warn("Board not found for update id={}", id);
             throw new ValidationException(BOARD_NOT_FOUND);
         }
+
+        Board existing = existingBoard.get();
+        String newBoardname = request.boardname() != null ? request.boardname() : existing.boardname();
+        String newDescription = request.description() != null ? request.description() : existing.description();
+
         Board updatedBoard = new Board(
-                existingBoard.get().id(),
-                existingBoard.get().owner_id(),
-                request.boardname(),
-                request.description()
+                existing.id(),
+                existing.owner_id(),
+                newBoardname,
+                newDescription,
+                existing.created_at(),
+                null,
+                existing.version()
         );
-        if(!boardRepository.updateBoard(updatedBoard))
-        {
+
+        if (!boardRepository.updateBoard(updatedBoard)) {
             log.error("Failed to update board id={}", id);
             throw new ValidationException("Board could not be updated");
         }
+
         return updatedBoard;
     }
 

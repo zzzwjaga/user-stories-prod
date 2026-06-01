@@ -30,7 +30,7 @@ public class BoardRepository {
             SELECT * 
             FROM boards
             ORDER BY boardname
-            LIMIT :pageSize
+            LIMIT :limit
             OFFSET :offset
             """;
         List<Board> boards = namedParameterJdbcTemplate.query(sql, Map.of("limit", pageSize, "offset", offset), BOARD_ROW_MAPPER);
@@ -40,17 +40,17 @@ public class BoardRepository {
         return boards;
     }
 
-    public List<Board> findByOwner(UUID owner_id,  int page, int pageSize) {
-        int offset = page * pageSize;
+    public List<Board> findByOwner(UUID owner_id,  int page, int size) {
+        int offset = page * size;
 
         String sql = """
         SELECT * FROM boards 
         WHERE owner_id = :owner_id
         ORDER BY boardname
-        LIMIT :pageSize
+        LIMIT :limit
         OFFSET :offset
         """;
-        List<Board> boardsByOwner = namedParameterJdbcTemplate.query(sql, Map.of("owner_id", owner_id, "limit", pageSize, "offset", offset), BOARD_ROW_MAPPER);
+        List<Board> boardsByOwner = namedParameterJdbcTemplate.query(sql, Map.of("owner_id", owner_id, "limit", size, "offset", offset), BOARD_ROW_MAPPER);
         if(boardsByOwner.isEmpty()) {
             return List.of();
         }
@@ -121,17 +121,14 @@ public class BoardRepository {
         UPDATE boards
             SET boardname = :boardname,
             description = :description,
-            version = :version+1, 
+            version = version + 1,
             updated_at = CURRENT_TIMESTAMP
         WHERE id = :id AND version = :version;
         """;
         int  rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of(
                 "id", board.id(),
-                "owner_id", board.owner_id(),
                 "boardname", board.boardname(),
                 "description", board.description(),
-                "created_at",  board.created_at(),
-                "updated_at", board.updated_at(),
                 "version", board.version()
         ));
         return rowsAffected == 1;
