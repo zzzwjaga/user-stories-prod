@@ -1,8 +1,12 @@
 package com.prod.user_stories_prod.services;
 
 import com.prod.user_stories_prod.entities.Board;
+import com.prod.user_stories_prod.entities.Role;
+import com.prod.user_stories_prod.entities.User;
+import com.prod.user_stories_prod.entities.UserBoard;
 import com.prod.user_stories_prod.exseptions.ValidationException;
 import com.prod.user_stories_prod.repositories.BoardRepository;
+import com.prod.user_stories_prod.repositories.UserBoardRepository;
 import com.prod.user_stories_prod.repositories.UserRepository;
 import com.prod.user_stories_prod.requests.CreateBoardRequest;
 import com.prod.user_stories_prod.requests.UpdateBoardRequest;
@@ -27,12 +31,14 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final UserBoardRepository userBoardRepository;
     private static final Logger log =
             LoggerFactory.getLogger(BoardService.class);
 
-    public BoardService(BoardRepository boardRepository, UserRepository userRepository) {
+    public BoardService(BoardRepository boardRepository, UserRepository userRepository, UserBoardRepository userBoardRepository) {
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
+        this.userBoardRepository = userBoardRepository;
     }
 
     @Transactional
@@ -54,6 +60,7 @@ public class BoardService {
                 request.boardname(),
                 request.description()
         );
+
         log.info("new board owner id = {}", newBoard.owner_id());
         if(!boardRepository.createBoard(newBoard))
         {
@@ -62,15 +69,24 @@ public class BoardService {
                     request.owner_id());
             throw new ValidationException("Board could not be created");
         }
+        if(!userBoardRepository.createUserRecord(new UserBoard(request.owner_id(), newBoard.id(), Role.OWNER)))
+        {
+            throw new ValidationException("Failed to assign owner role");
+        }
         log.info("Board created boardId={}", newBoard.id());
         return newBoard;
     }
 
 
     @Transactional
-    public PageResponce<Board> findAllBoards(int page, int pageSize)
+    public PageResponce<Board> findAllBoards(String email, int page, int pageSize)
     {
-        List<Board> boards = boardRepository.findAll(page, pageSize);
+        Optional<User> maybeUser = userRepository.findByEmail(email);
+        if(maybeUser.isEmpty())
+        {
+            throw new ValidationException(USER_NOT_FOUND);
+        }
+        List<Board> boards = boardRepository.findByUserId(maybeUser.get().id(), page, pageSize);
         long total = boardRepository.countAll();
         int totalPages = (int) Math.ceil((double) total / pageSize);
         log.info("Fetched boards count={}", boards.size());

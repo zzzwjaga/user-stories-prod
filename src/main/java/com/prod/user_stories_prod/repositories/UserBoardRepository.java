@@ -2,6 +2,7 @@ package com.prod.user_stories_prod.repositories;
 
 import com.prod.user_stories_prod.entities.Role;
 import com.prod.user_stories_prod.entities.UserBoard;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -28,7 +29,7 @@ public class UserBoardRepository {
         Map<String,Object> params = Map.of(
                 "user_id", userBoard.user_id(),
                 "board_id", userBoard.board_id(),
-                "role", userBoard.role()
+                "role", userBoard.role().name()
         );
 
         int rowsAffected = namedParameterJdbcTemplate.update(sql, params);
@@ -156,12 +157,28 @@ public class UserBoardRepository {
         return rowsAffected == 1;
     }
 
+    public Optional<String> findRoleByUserEmailAndBoardId(String userEmail, UUID boardId) {
+        String sql = """
+        SELECT ubr.role 
+        FROM user_boards ubr
+        JOIN users u ON u.id = ubr.user_id
+        WHERE u.email = :email AND ubr.board_id = :board_id
+        """;
+        Map<String, Object> params = Map.of("email", userEmail, "board_id", boardId);
+        try {
+            String role = namedParameterJdbcTemplate.queryForObject(sql, params, String.class);
+            return Optional.ofNullable(role);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
 
 
     private static final RowMapper<UserBoard> USER_BOARD_ROW_MAPPER = (rs,rowNum)->
             new UserBoard(
                     rs.getObject("user_id", UUID.class),
                     rs.getObject("board_id", UUID.class),
-                    rs.getObject("role", Role.class)
+                    Role.valueOf(rs.getString("role"))
             );
 }

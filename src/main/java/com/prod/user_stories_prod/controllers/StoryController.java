@@ -9,6 +9,7 @@ import com.prod.user_stories_prod.responses.PageResponce;
 import com.prod.user_stories_prod.services.StoryTemplateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.prod.user_stories_prod.services.StoryService;
 
@@ -31,12 +32,14 @@ public class StoryController {
     }
 
     @GetMapping("/stories/template")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> getStoriesTemplate() {
         String template = storyTemplateService.getTemplate();
         return ResponseEntity.ok(template);
     }
 
     @GetMapping("/boards/{board_id}/stories")
+    @PreAuthorize("@boardSecurityService.canView(authentication.name, #board_id)")
     public ResponseEntity<PageResponce<Story>> getAllStories(@PathVariable UUID board_id,
                                                              @RequestParam(defaultValue = "0") Integer page,
                                                              @RequestParam(defaultValue = "15") Integer size) {
@@ -46,6 +49,7 @@ public class StoryController {
     }
 
     @GetMapping("/boards/{board_id}/stories/{number}")
+    @PreAuthorize("@boardSecurityService.canView(authentication.name, #board_id)")
     public ResponseEntity<Story>  getStoryByNumber(@PathVariable UUID board_id,@PathVariable String number)
     {
        Optional<Story> story = storyService.findStoryByNumber(board_id, number);
@@ -53,12 +57,14 @@ public class StoryController {
     }
 
     @GetMapping("/stories/{story_id}")
+    @PreAuthorize("@storySecurityService.canView(authentication.name, #story_id)")
     public ResponseEntity<Story> getStoryById(@PathVariable UUID story_id){
         Optional<Story> story = storyService.findStoryById(story_id);
         return ResponseEntity.ok(story.get());
     }
 
     @GetMapping("/stories/{story_id}/statuses")
+    @PreAuthorize("@storySecurityService.canView(authentication.name, #story_id)")
      ResponseEntity<PageResponce<StoryStatus>> getAllStatuses(
             @PathVariable UUID story_id,
             @RequestParam(defaultValue = "0") int page,
@@ -69,12 +75,14 @@ public class StoryController {
     }
 
     @GetMapping("/stories/{story_id}/statuses/latest")
+    @PreAuthorize("@storySecurityService.canView(authentication.name, #story_id)")
     public ResponseEntity<StoryStatus> getLatestStatus(@PathVariable UUID story_id) {
         StoryStatus latestStatus = storyService.findLatestStatus(story_id);
         return ResponseEntity.ok(latestStatus);
     }
 
     @PostMapping("/boards/{board_id}/stories")
+    @PreAuthorize("@boardSecurityService.canEdit(authentication.name, #board_id)")
     public ResponseEntity<Story> createStory(
             @PathVariable UUID board_id,
             @RequestBody CreateStoryRequest request) {
@@ -85,6 +93,7 @@ public class StoryController {
     }
 
     @PutMapping("/stories/{story_id}")
+    @PreAuthorize("@storySecurityService.canEdit(authentication.name, #story_id)")
     public ResponseEntity<Story> updateStory(
             @PathVariable UUID story_id,
             @RequestBody UpdateStoryRequest request
@@ -94,6 +103,7 @@ public class StoryController {
     }
 
     @PatchMapping("/stories/{story_id}/status")
+    @PreAuthorize("@storySecurityService.canEdit(authentication.name, #story_id)")
     public ResponseEntity<Void> changeStatus(
             @PathVariable UUID story_id,
             @RequestParam String status) {
@@ -103,6 +113,7 @@ public class StoryController {
     }
 
     @DeleteMapping("/stories/{story_id}")
+    @PreAuthorize("@storySecurityService.canEdit(authentication.name, #story_id)")
     public ResponseEntity<Story> deleteStory(
             @PathVariable UUID story_id) {
        storyService.deleteStory(story_id);

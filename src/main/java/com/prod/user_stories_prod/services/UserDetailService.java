@@ -26,12 +26,12 @@ public class UserDetailService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email)  {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            log.warn("User not found email={}", email);
-            throw new ValidationException(String.valueOf(USER_NOT_FOUND));
-        }
-        return user.get();
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.warn("User not found email={}", email);
+                    return new UsernameNotFoundException("User not found: " + email);
+                });
     }
 }

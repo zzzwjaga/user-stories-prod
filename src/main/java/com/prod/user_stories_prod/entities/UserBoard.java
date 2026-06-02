@@ -7,4 +7,7 @@ public record UserBoard(
         UUID board_id,
         Role role
 ) {
+    public Object getRole() {
+        return role;
+    }
 }

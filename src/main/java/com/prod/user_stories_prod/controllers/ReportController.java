@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,18 +30,21 @@ public class ReportController {
     private String reportsDir;
 
     @GetMapping("/board/{board_id}")
+    @PreAuthorize("@boardSecurityService.canEdit(authentication.name, #board_id)")
     public ResponseEntity<Report> getReport(@PathVariable UUID board_id){
         Report report = reportService.generateReport(board_id);
         return ResponseEntity.ok(report);
     }
 
     @GetMapping(value = "/board/{board_id}/json", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("@boardSecurityService.canEdit(authentication.name, #board_id)")
     public ResponseEntity<String> getReportJson(@PathVariable UUID board_id){
         String json = reportService.genereatedAsJson(board_id);
         return ResponseEntity.ok(json);
     }
 
     @GetMapping("/board/{board_id}/export")
+    @PreAuthorize("@boardSecurityService.canEdit(authentication.name, #board_id)")
     public ResponseEntity<byte[]> exportReport(@PathVariable UUID board_id){
         String filePath = reportService.generateReportAndSaveToFile(board_id, reportsDir);
         try{

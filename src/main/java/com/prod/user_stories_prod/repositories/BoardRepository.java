@@ -57,6 +57,24 @@ public class BoardRepository {
         return boardsByOwner;
     }
 
+    public List<Board> findByUserId(UUID user_id,  int page, int size) {
+        int offset = page * size;
+        String sql = """
+        SELECT * FROM boards
+        JOIN user_boards
+        ON boards.id = user_boards.board_id
+        WHERE user_boards.user_id = :user_id
+        """;
+
+        List<Board> boards = namedParameterJdbcTemplate.query(sql, Map.of("user_id", user_id, "limit", size, "offset", offset), BOARD_ROW_MAPPER);
+        if(boards.isEmpty()) {
+            return List.of();
+        }
+        return boards;
+    }
+
+
+
     public Optional<Board> findById(UUID id) {
         String sql = "SELECT * FROM boards WHERE id = :id";
         List<Board> boards = namedParameterJdbcTemplate.query(sql, Map.of("id", id), BOARD_ROW_MAPPER);
@@ -178,6 +196,17 @@ public class BoardRepository {
                 Map.of("owner_id", owner_id),
                 Long.class
         );
+    }
+
+    public boolean isUserOwner(String userEmail, UUID boardId) {
+        String sql = """
+        SELECT COUNT(*) > 0
+        FROM boards b
+        JOIN users u ON u.id = b.owner_id
+        WHERE u.email = :email AND b.id = :board_id
+        """;
+        Map<String, Object> params = Map.of("email", userEmail, "board_id", boardId);
+        return Boolean.TRUE.equals(namedParameterJdbcTemplate.queryForObject(sql, params, Boolean.class));
     }
 
 

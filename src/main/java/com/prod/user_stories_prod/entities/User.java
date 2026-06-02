@@ -24,7 +24,7 @@ public record User(
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of();
     }
 
     @Override
@@ -34,7 +34,7 @@ public record User(
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override

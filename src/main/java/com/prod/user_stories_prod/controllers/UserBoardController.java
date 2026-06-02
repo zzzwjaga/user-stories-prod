@@ -5,6 +5,7 @@ import com.prod.user_stories_prod.entities.UserBoard;
 import com.prod.user_stories_prod.responses.PageResponce;
 import com.prod.user_stories_prod.services.UserBoardService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -20,6 +21,7 @@ public class UserBoardController {
     }
 
     @PostMapping
+    @PreAuthorize("@boardSecurityService.isOwner(authentication.name, #board_id)")
     public ResponseEntity<UserBoard> addUserBoard(@PathVariable UUID board_id,
                                                   @RequestParam UUID user_id,
                                                   @RequestParam Role role) {
@@ -28,6 +30,7 @@ public class UserBoardController {
     }
 
     @GetMapping("/{user_id}")
+    @PreAuthorize("@boardSecurityService.isOwner(authentication.name, #board_id)")
     public ResponseEntity<PageResponce<UserBoard>> getByUserId(@PathVariable UUID user_id,
                                                                @PathVariable UUID board_id,
                                                                @RequestParam(defaultValue = "0") Integer page,
@@ -37,6 +40,7 @@ public class UserBoardController {
     }
 
     @GetMapping
+    @PreAuthorize("@boardSecurityService.isOwner(authentication.name, #board_id)")
     public ResponseEntity<PageResponce<UserBoard>> getByBoardId(@PathVariable UUID board_id,
                                                                 @RequestParam(defaultValue = "10") Integer size,
                                                                 @RequestParam(defaultValue = "0") Integer page){
@@ -45,6 +49,7 @@ public class UserBoardController {
     }
 
     @DeleteMapping("/{user_id}")
+    @PreAuthorize("@boardSecurityService.isOwner(authentication.name, #board_id)")
     public ResponseEntity<UserBoard> deleteByUserId(@PathVariable UUID user_id,
                                                     @PathVariable UUID board_id){
         userBoardService.deleteByUserId(user_id);
@@ -52,12 +57,14 @@ public class UserBoardController {
     }
 
     @DeleteMapping
+    @PreAuthorize("@boardSecurityService.isOwner(authentication.name, #board_id)")
     public ResponseEntity<UserBoard> deleteByBoardId(@PathVariable UUID board_id){
         userBoardService.deleteByBoardId(board_id);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@boardSecurityService.isOwner(authentication.name, #board_id)")
     public ResponseEntity<UserBoard> deleteById(@PathVariable UUID id,
                                                 @PathVariable UUID board_id){
         userBoardService.deleteByKey(board_id,id);
