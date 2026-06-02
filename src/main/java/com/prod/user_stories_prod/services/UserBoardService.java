@@ -183,11 +183,4 @@ public class UserBoardService {
         }
         return true;
     }
-
-
-
-
-
-
-
 }

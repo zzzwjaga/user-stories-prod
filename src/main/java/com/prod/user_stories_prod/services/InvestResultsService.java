@@ -85,7 +85,7 @@ public class InvestResultsService {
 
 
     @Transactional
-    PageResponce<InvestResults> findInvestResultsByStoryId(UUID story_id, int page, int pageSize) {
+    public PageResponce<InvestResults> findInvestResultsByStoryId(UUID story_id, int page, int pageSize) {
         Optional<Story> story = storyRepository.findById(story_id);
         if (story.isEmpty()) {
             throw new ValidationException(ErrorCode.STORY_NOT_FOUND);

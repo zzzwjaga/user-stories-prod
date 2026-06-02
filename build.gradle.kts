@@ -16,9 +16,9 @@ java {
 
 repositories {
 	mavenCentral()
-	maven {
+	/*maven {
 		url = uri("https://repo.spring.io/milestone")
-	}
+	}*/
 }
 
 dependencies {
@@ -32,7 +32,7 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6") 
+	//implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6")
 }
 
 tasks.withType<Test> {

@@ -29,7 +29,7 @@ public class InvestResultsRepository {
                 LIMIT 1
                 """;
 
-        Optional<InvestResults> lastInvestResult = namedParameterJdbcTemplate.query(sql, Map.of("id", story_id), INVEST_RESULTS_ROW_MAPPER).stream().findFirst();
+        Optional<InvestResults> lastInvestResult = namedParameterJdbcTemplate.query(sql, Map.of("story_id", story_id), INVEST_RESULTS_ROW_MAPPER).stream().findFirst();
         return lastInvestResult;
     }
 
@@ -40,11 +40,11 @@ public class InvestResultsRepository {
                 SELECT * FROM investresults
                 WHERE stories_id = :story_id
                 ORDER BY checked_at
-                LIMIT :pageSize
+                LIMIT :limit
                 OFFSET :offset
                 """;
         List<InvestResults> investResults = namedParameterJdbcTemplate.query(sql, Map.of(
-                "id", story_id,
+                "story_id", story_id,
                 "limit", pageSize,
                 "offset", offset
         ), INVEST_RESULTS_ROW_MAPPER).stream().toList();
@@ -62,7 +62,7 @@ public class InvestResultsRepository {
             """;
 
         Map<String, Object> params = Map.of(
-                "stories_id", investResults.story_id(),
+                "story_id", investResults.story_id(),
                 "checked_at", investResults.checked_at(),
                 "independent_score", investResults.independent_score(),
                 "negotiable_score", investResults.negotiable_score(),
@@ -103,13 +103,13 @@ public class InvestResultsRepository {
         """;
         return namedParameterJdbcTemplate.queryForObject(
                 sql,
-                Map.of(),
+                Map.of("story_id", story_id),
                 Long.class
         );
     }
 
     private static final RowMapper<InvestResults> INVEST_RESULTS_ROW_MAPPER = (rs, rowNum) -> new InvestResults(
-            rs.getObject("story_id", UUID.class),
+            rs.getObject("stories_id", UUID.class),
             rs.getTimestamp("checked_at"),
             rs.getInt("independent_score"),
             rs.getInt("negotiable_score"),
