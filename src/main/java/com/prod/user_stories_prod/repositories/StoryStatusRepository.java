@@ -60,7 +60,7 @@ public class StoryStatusRepository {
                 SELECT *
                 FROM stories_statuses
                 WHERE story_id = :story_id
-                ORDER BY changed_at
+                ORDER BY changed_at DESC
                 LIMIT 1
         """;
 

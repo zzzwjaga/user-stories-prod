@@ -67,7 +67,7 @@ public class InvestResultsService {
     }
 
     @Transactional
-    public InvestResults findLastInvestResultsByStoryId(UUID story_id) {
+    public Optional<InvestResults> findLastInvestResultsByStoryId(UUID story_id) {
         Optional<Story> story = storyRepository.findById(story_id);
         if (story.isEmpty()) {
             log.warn("Story not found storyId={}", story_id);
@@ -76,11 +76,12 @@ public class InvestResultsService {
 
         Optional<InvestResults> investResults = investResultsRepository.findLastById(story_id);
         if (investResults.isEmpty()) {
-            log.warn("No INVEST results found storyId={}", story_id);
-            throw new ValidationException(ErrorCode.INVEST_RESULT_NOT_FOUND);
+            log.info("No INVEST results found storyId={}", story_id);
+            return Optional.empty();  // Возвращаем empty вместо исключения
         }
+
         log.info("Last INVEST result fetched storyId={}", story_id);
-        return investResults.get();
+        return investResults;
     }
 
 

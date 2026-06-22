@@ -4,12 +4,12 @@ import com.prod.user_stories_prod.entities.Status;
 import com.prod.user_stories_prod.entities.Story;
 import com.prod.user_stories_prod.entities.StoryStatus;
 import com.prod.user_stories_prod.requests.CreateStoryRequest;
-import com.prod.user_stories_prod.requests.UpdateStoryRequest;
 import com.prod.user_stories_prod.responses.PageResponce;
 import com.prod.user_stories_prod.services.StoryTemplateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.prod.user_stories_prod.services.StoryService;
 
@@ -85,8 +85,9 @@ public class StoryController {
     @PreAuthorize("@boardSecurityService.canEdit(authentication.name, #board_id)")
     public ResponseEntity<Story> createStory(
             @PathVariable UUID board_id,
-            @RequestBody CreateStoryRequest request) {
-        Story created = storyService.createStory(board_id, request);
+            @RequestBody CreateStoryRequest request,
+             Authentication authentication) {
+        Story created = storyService.createStory(board_id, request, authentication.getName());
         URI location = URI.create(String.format("/api/boards/%s/stories/%s",
                 board_id, created.number()));
         return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created);
@@ -96,7 +97,7 @@ public class StoryController {
     @PreAuthorize("@storySecurityService.canEdit(authentication.name, #story_id)")
     public ResponseEntity<Story> updateStory(
             @PathVariable UUID story_id,
-            @RequestBody UpdateStoryRequest request
+            @RequestBody CreateStoryRequest request
     ) {
         Story updated = storyService.updateStory(story_id, request);
         return ResponseEntity.ok(updated);
@@ -106,10 +107,10 @@ public class StoryController {
     @PreAuthorize("@storySecurityService.canEdit(authentication.name, #story_id)")
     public ResponseEntity<Void> changeStatus(
             @PathVariable UUID story_id,
-            @RequestParam String status) {
+            @RequestParam Status status) {
 
-        storyService.changeStatus(story_id, Status.valueOf(status));
-        return ResponseEntity.noContent().build();
+        storyService.changeStatus(story_id, status);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/stories/{story_id}")

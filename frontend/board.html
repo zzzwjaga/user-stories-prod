@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Board</title>
+        <link rel = "stylesheet" href="css/style.css">
+    </head>
+
+<body>
+<header class="topbar">
+
+    <div class="logo-container">
+    <img src="icons/main-icon.png" alt="Logo">
+    <div class="app-name">
+        UserStoriesApp
+    </div>
+    </div>
+    <div class="user-section">
+
+        <img src="icons/icon-user.png">
+        <span id="currentUser"></span>
+
+        <button id="logoutBtn">
+            Logout
+        </button>
+
+    </div>
+
+    </header>
+
+<h1 id="boardTitle">Board</h1>
+<p id="boardDescription"></p>
+
+<div id="storiesContainer"></div>
+
+<button id="createBtn">
+    Create Story
+</button>
+
+<button id="createBtn">
+    Create report
+</button>
+
+
+<div id = "overlay" class="hidden"></div>
+
+<div id="createStoryModal" class="modal hidden">
+
+    <h2 id="modalTitle">Create Story</h2>
+
+    <form id="createStoryForm">
+
+       <textarea id="storyTextInput" placeholder="Story text"></textarea>
+       <input id="storyPointsInput" placeholder="Story Points" required>
+
+        <button id="submitStoryBtn" type="submit">Create</button>
+
+    </form>
+
+</div>
+
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+
+<div id="pagination"></div>
+
+<script src="js/api.js"></script>
+<script src="js/story.js"></script>
+
+</body>
+</html>

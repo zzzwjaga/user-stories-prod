@@ -141,7 +141,7 @@ public class UserService {
     @Transactional
     public void deleteUser(UUID id)
     {
-        Optional<User> user = userRepository.findById(id);
+        Optional<User> user = userRepository.findByIdForUpdate(id);
         if(user.isEmpty())
         {
             log.warn("User not found id={}", id);

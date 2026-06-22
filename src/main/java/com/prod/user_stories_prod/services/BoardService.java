@@ -42,21 +42,23 @@ public class BoardService {
     }
 
     @Transactional
-    public Board createBoard(CreateBoardRequest request)
+    public Board createBoard(CreateBoardRequest request, String email)
     {
-        log.info("owner id = {}", request.owner_id());
+        log.info("owner email : {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ValidationException(USER_NOT_FOUND));
         boardRepository.lockOnValue(request.boardname());
-        Optional<Board> maybeBoard = boardRepository.findByName(request.owner_id(),  request.boardname());
+        Optional<Board> maybeBoard = boardRepository.findByName(user.id(),  request.boardname());
         if(maybeBoard.isPresent())
         {
             log.warn("Board already exists name={} ownerId={}",
                     request.boardname(),
-                    request.owner_id());
+                    user.id());
             throw new ValidationException(String.valueOf(ErrorCode.BOARD_ALREADY_EXISTS));
         }
         Board newBoard = new Board(
                 UUID.randomUUID(),
-                request.owner_id(),
+                user.id(),
                 request.boardname(),
                 request.description()
         );
@@ -66,10 +68,10 @@ public class BoardService {
         {
             log.error("Failed to create board name={} ownerId={}",
                     request.boardname(),
-                    request.owner_id());
+                    user.id());
             throw new ValidationException("Board could not be created");
         }
-        if(!userBoardRepository.createUserRecord(new UserBoard(request.owner_id(), newBoard.id(), Role.OWNER)))
+        if(!userBoardRepository.createUserRecord(new UserBoard(user.id(), newBoard.id(), Role.OWNER)))
         {
             throw new ValidationException("Failed to assign owner role");
         }
@@ -152,7 +154,7 @@ public class BoardService {
 
     public  void deleteBoard(UUID id)
     {
-        Optional<Board> maybeBoard = boardRepository.findById(id);
+        Optional<Board> maybeBoard = boardRepository.findByIdForUpdate(id);
         if(maybeBoard.isEmpty())
         {
             log.warn("Board not found for delete id={}", id);

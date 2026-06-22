@@ -15,12 +15,10 @@ import java.util.UUID;
 public class BoardRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final OrderedFormContentFilter orderedFormContentFilter;
 
 
     public BoardRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, OrderedFormContentFilter orderedFormContentFilter) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.orderedFormContentFilter = orderedFormContentFilter;
     }
 
     public List<Board> findAll(int page, int pageSize) {
@@ -197,18 +195,6 @@ public class BoardRepository {
                 Long.class
         );
     }
-
-    public boolean isUserOwner(String userEmail, UUID boardId) {
-        String sql = """
-        SELECT COUNT(*) > 0
-        FROM boards b
-        JOIN users u ON u.id = b.owner_id
-        WHERE u.email = :email AND b.id = :board_id
-        """;
-        Map<String, Object> params = Map.of("email", userEmail, "board_id", boardId);
-        return Boolean.TRUE.equals(namedParameterJdbcTemplate.queryForObject(sql, params, Boolean.class));
-    }
-
 
     public void lockOnValue(Object value){
         String sql = "SELECT pg_advisory_xact_lock(hashtext(:lock));";

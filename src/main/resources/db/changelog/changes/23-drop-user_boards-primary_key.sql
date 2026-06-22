@@ -1,0 +1,1 @@
+ALTER TABLE user_boards DROP CONSTRAINT user_boards_pkey;

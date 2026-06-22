@@ -43,5 +43,7 @@ databaseChangeLog:
       file: db/changelog/changes/21-add-board-version.sql
   - include:
       file: db/changelog/changes/22-add-user-version.sql
+  - include:
+      file: db/changelog/changes/23-drop-user_boards-primary_key.sql
 
 

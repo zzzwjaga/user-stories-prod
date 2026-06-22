@@ -149,9 +149,9 @@ public class UserBoardRepository {
                 """;
 
         int rowsAffected = namedParameterJdbcTemplate.update(sql, Map.of(
-                "board_id", userBoard.board_id(),
                 "user_id", userBoard.user_id(),
-                "role", userBoard.role()
+                "board_id", userBoard.board_id(),
+                "role", userBoard.role().name()
         ));
 
         return rowsAffected == 1;

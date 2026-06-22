@@ -26,6 +26,16 @@ public class UserRepository {
         return namedParameterJdbcTemplate.query(sql, Map.of("id", id), USER_ROW_MAPPER).stream().findFirst();
     }
 
+    public Optional<User> findByIdForUpdate(UUID id) {
+        String sql = """
+                SELECT *
+                FROM users
+                WHERE id = :id
+                FOR UPDATE
+                """;
+        return namedParameterJdbcTemplate.query(sql, Map.of("id", id), USER_ROW_MAPPER).stream().findFirst();
+    }
+
     public Optional<User> findByUsername(String username) {
         String sql = """
                 SELECT *

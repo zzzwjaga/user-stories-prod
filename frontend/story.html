@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Story Details</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="logo-container">
+    <img src="icons/main-icon.png" alt="Logo">
+    <div class="app-name">
+        UserStoriesApp
+    </div>
+    </div>
+    <div class="user-section">
+
+        <img src="icons/icon-user.png">
+        <span id="currentUser"></span>
+
+        <button id="logoutBtn">
+            Logout
+        </button>
+
+    </div>
+    </header>
+
+<!-- MAIN STORY VIEW -->
+<main class="story-page">
+
+    <h1>Story</h1>
+
+    <!-- BASIC INFO -->
+    <section class="story-card-full">
+        <h2 id="storyNumber"></h2>
+
+        <p id="storyText"></p>
+
+        <div class="story-meta">
+            <span id="storyPoints"></span>
+        </div>
+
+        <div id = "statusSection">
+            <p>Status</p>
+            <select id="statusSelect">
+                <option value="NEW">NEW</option>
+                <option value="IN_PROGRESS">IN PROGRESS</option>
+                <option value="IN_REVIEW">IN REVIEW</option>
+                <option value="COMPLETED">COMPLETED</option>
+            </select>
+        </div>
+
+        <div class="story-actions">
+            <button id="runInvestBtn">Run INVEST</button>
+            <button id="editStoryBtn">Edit</button>
+            <button id="deleteStoryBtn">Delete</button>
+            
+        </div>
+    </section>
+
+    <!-- CURRENT INVEST RESULT -->
+    <section class="invest-section">
+        <h2>Latest INVEST Result</h2>
+
+        <div id="latestInvestContainer">
+            <!-- JS render -->
+        </div>
+    </section>
+
+</main>
+
+<!-- EDIT STORY MODAL -->
+<div id="storyModal" class="modal hidden">
+    <h2 id="modalTitle">Edit Story</h2>
+
+    <form id="storyForm">
+
+        <textarea id="storyTextInput" placeholder="Story text"></textarea>
+        <input id="storyPointsInput" placeholder="Story Points" required>
+
+        <button id="saveStoryBtn" type="submit">Save</button>
+    </form>
+</div>
+
+<!-- INVEST DETAILS MODAL (optional detailed view) -->
+<div id="investModal" class="modal hidden">
+
+    <h2>INVEST Check</h2>
+
+    <div id="investStoryContent"></div>
+
+    <button id="runInvestBtnModal">Run INVEST check</button>
+
+    <div id="investResultsContainer"></div>
+
+    <button id="closeInvestModalBtn">Close</button>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay" class="hidden"></div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- SCRIPTS -->
+<script src="js/api.js"></script>
+<script src="js/story-detail.js"></script>
+
+</body>
+</html>

@@ -19,22 +19,4 @@ public class GlobalExceptionHandler {
         ErrorResponce error = new ErrorResponce("VALIDATION_ERROR", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
-
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponce> handleIllegalState(IllegalStateException ex) {
-        ErrorResponce error = new ErrorResponce("ILLEGAL_STATE", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ErrorResponce> handleNotFound(NoSuchElementException ex) {
-        ErrorResponce error = new ErrorResponce("NOT_FOUND", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponce> handleAll(Exception ex) {
-        ErrorResponce error = new ErrorResponce("INTERNAL_ERROR", "Что-то пошло не так");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
 }

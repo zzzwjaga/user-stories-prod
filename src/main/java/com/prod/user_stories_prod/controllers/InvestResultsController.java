@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -29,8 +30,8 @@ public class InvestResultsController {
 
     @GetMapping("/story/{story_id}/latest")
     @PreAuthorize("@storySecurityService.canView(authentication.name, #story_id)")
-    public ResponseEntity<InvestResults> getLatestInvestResults(@PathVariable UUID story_id){
-        InvestResults results = investResultsService.findLastInvestResultsByStoryId(story_id);
+    public ResponseEntity<Optional<InvestResults>> getLatestInvestResults(@PathVariable UUID story_id){
+        Optional<InvestResults> results = investResultsService.findLastInvestResultsByStoryId(story_id);
         return ResponseEntity.ok(results);
     }
 

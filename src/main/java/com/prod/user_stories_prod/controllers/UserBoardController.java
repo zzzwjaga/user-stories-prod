@@ -29,6 +29,15 @@ public class UserBoardController {
         return ResponseEntity.ok().body(userBoard);
     }
 
+    @PutMapping
+    @PreAuthorize("@boardSecurityService.isOwner(authentication.name, #board_id)")
+    public ResponseEntity<Boolean> updateRole(@PathVariable UUID board_id,
+                                              @RequestParam UUID user_id,
+                                              @RequestParam Role role) {
+        Boolean result = userBoardService.updateRole(board_id,user_id,role);
+        return ResponseEntity.ok().body(result);
+    }
+
     @GetMapping("/{user_id}")
     @PreAuthorize("@boardSecurityService.isOwner(authentication.name, #board_id)")
     public ResponseEntity<PageResponce<UserBoard>> getByUserId(@PathVariable UUID user_id,

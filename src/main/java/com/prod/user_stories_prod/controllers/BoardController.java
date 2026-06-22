@@ -2,6 +2,7 @@
 package com.prod.user_stories_prod.controllers;
 
 import com.prod.user_stories_prod.entities.Board;
+import com.prod.user_stories_prod.entities.Role;
 import com.prod.user_stories_prod.requests.CreateBoardRequest;
 import com.prod.user_stories_prod.requests.UpdateBoardRequest;
 import com.prod.user_stories_prod.responses.PageResponce;
@@ -58,8 +59,9 @@ public class BoardController {
 
     @PostMapping("/boards")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Board> createBoard(@RequestBody CreateBoardRequest request){
-        Board created = boardService.createBoard(request);
+    public ResponseEntity<Board> createBoard(@RequestBody CreateBoardRequest request,
+                                             Authentication authentication){
+        Board created = boardService.createBoard(request,authentication.getName());
         URI location = URI.create(String.format("/api/boards/%s",
                created.id().toString()));
         return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created);
@@ -78,6 +80,12 @@ public class BoardController {
         boardService.deleteBoard(board_id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/boards/{board_id}/my-role")
+    public Role getMyRole(@PathVariable UUID board_id, Authentication auth){
+        return boardSecurityService.getRole(auth.getName(), board_id);
+    }
+
 
 
 

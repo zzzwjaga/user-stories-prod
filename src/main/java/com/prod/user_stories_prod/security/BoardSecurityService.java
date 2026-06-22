@@ -45,7 +45,7 @@ public class BoardSecurityService {
     }
 
 
-    private Role getRole(String email, UUID board_id) {
+    public Role getRole(String email, UUID board_id) {
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isEmpty()) {
             throw new ValidationException(ErrorCode.USER_NOT_FOUND);

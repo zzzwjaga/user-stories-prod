@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User stories app</title>
+
+    <link rel = "stylesheet" href="css/style.css">
+</head>
+
+<body class="auth-page">
+
+<div class="auth-container">
+
+    <h1 class="app-title">UserStoriesApp</h1>
+
+    <form id="loginForm" class="auth-form">
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            required
+        />
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+        />
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+    <div id="error" class="error hidden"></div>
+
+</div>
+
+
+
+<script src="js/auth.js"></script>
+
+</body>

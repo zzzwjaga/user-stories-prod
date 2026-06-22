@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User stories app</title>
+
+    <link rel = "stylesheet" href="css/style.css">
+</head>
+
+
+<body>
+
+    <header class="topbar">
+
+    <div class="logo-container">
+    <img src="icons/main-icon.png" alt="Logo">
+    <div class="app-name">
+        UserStoriesApp
+    </div>
+    </div>
+    <div class="user-section">
+
+        <img src="icons/icon-user.png">
+        <span id="currentUser"></span>
+
+        <button id="logoutBtn">
+            Logout
+        </button>
+
+    </div>
+
+    </header>
+
+
+<div id="boardsContainer"></div>
+
+<button id="createBtn">
+    Create board
+</button>
+
+
+
+<script src="js/api.js"></script>
+<script src="js/board.js"></script>
+
+<!-- OVERLAY -->
+<div id="overlay" class="hidden"></div>
+
+<!-- MODAL -->
+<div id="createBoardModal" class="modal hidden">
+
+    <h2 id="modalTitle">Create Board</h2>
+
+    <form id="createBoardForm">
+
+        <input id="boardName" placeholder="Board name" required>
+        <textarea id="boardDescription" placeholder="Description"></textarea>
+
+        <button id="submitBoardBtn" type="submit">Create</button>
+
+    </form>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+<div id="pagination"></div>
+
+</body>
+</html>

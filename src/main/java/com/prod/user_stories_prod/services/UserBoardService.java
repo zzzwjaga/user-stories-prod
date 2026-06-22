@@ -176,7 +176,7 @@ public class UserBoardService {
             throw new ValidationException(ErrorCode.BOARD_NOT_FOUND);
         }
 
-        if(!userBoardRepository.updateRole(new UserBoard(board_id, user_id, role))){
+        if(!userBoardRepository.updateRole(new UserBoard(user_id, board_id, role))){
             log.error("Failed to update user role boardId={} userId={}",
                     board_id, user_id);
             throw new ValidationException("Record could not be updated");

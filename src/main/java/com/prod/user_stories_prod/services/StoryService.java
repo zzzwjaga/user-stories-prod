@@ -3,9 +3,11 @@ package com.prod.user_stories_prod.services;
 import com.prod.user_stories_prod.entities.Status;
 import com.prod.user_stories_prod.entities.Story;
 import com.prod.user_stories_prod.entities.StoryStatus;
+import com.prod.user_stories_prod.entities.User;
 import com.prod.user_stories_prod.exseptions.ValidationException;
 import com.prod.user_stories_prod.repositories.BoardRepository;
 import com.prod.user_stories_prod.repositories.StoryStatusRepository;
+import com.prod.user_stories_prod.repositories.UserRepository;
 import com.prod.user_stories_prod.responses.PageResponce;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.prod.user_stories_prod.repositories.StoryRepository;
 import com.prod.user_stories_prod.requests.CreateStoryRequest;
-import com.prod.user_stories_prod.requests.UpdateStoryRequest;
 import com.prod.user_stories_prod.responses.ErrorCode;
 
 
@@ -31,15 +32,19 @@ public class StoryService {
     private final StoryStatusRepository storyStatusRepository;
     private static final Logger log =
             LoggerFactory.getLogger(StoryService.class);
+    private final UserRepository userRepository;
 
-    public StoryService(StoryRepository storyRepository, BoardRepository boardRepository, StoryStatusRepository storyStatusRepository) {
+    public StoryService(StoryRepository storyRepository, BoardRepository boardRepository, StoryStatusRepository storyStatusRepository, UserRepository userRepository) {
         this.storyRepository = storyRepository;
         this.boardRepository = boardRepository;
         this.storyStatusRepository = storyStatusRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
-    public Story createStory(UUID board_id, CreateStoryRequest request) {
+    public Story createStory(UUID board_id, CreateStoryRequest request, String email) {
+        log.info("owner email: {}", email);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ValidationException(ErrorCode.USER_NOT_FOUND));
         if(boardRepository.findById(board_id).isEmpty()) {
             log.warn("Board not found boardId={}", board_id);
             throw new ValidationException(ErrorCode.BOARD_NOT_FOUND);
@@ -48,6 +53,7 @@ public class StoryService {
                 boardRepository.getNextStoryNumber(board_id);
 
         String storyNumber = "US-" + sequence;
+        storyRepository.lockOnValue(storyNumber + board_id);
         log.info("Generated story number={} boardId={}", storyNumber, board_id);
         Story newStory = new Story(
                 UUID.randomUUID(),
@@ -55,7 +61,7 @@ public class StoryService {
                 request.story_points(),
                 request.story_text(),
                 board_id,
-                request.author_id()
+                user.id()
         );
         if(!storyRepository.createStory(newStory))
         {
@@ -121,7 +127,7 @@ public class StoryService {
     }
 
     @Transactional
-    public Story updateStory(UUID story_id, UpdateStoryRequest request) {
+    public Story updateStory(UUID story_id, CreateStoryRequest request) {
         Optional<Story> existingStory = storyRepository.findById(story_id);
         if (existingStory.isEmpty()) {
             log.warn("Story not found storyId={}", story_id);
@@ -221,7 +227,7 @@ public class StoryService {
 
     @Transactional
     public void deleteStory(UUID id) {
-        Optional<Story> maybeStory = storyRepository.findById(id);
+        Optional<Story> maybeStory = storyRepository.findByIdForUpdate(id);
         if (maybeStory.isEmpty()) {
             log.warn("Story not found storyId={}", id);
             throw new ValidationException(String.valueOf(ErrorCode.STORY_NOT_FOUND));}

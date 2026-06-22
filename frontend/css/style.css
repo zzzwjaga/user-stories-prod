@@ -1,0 +1,858 @@
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/Montserrat-Light.ttf")
+    format("truetype");
+
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/Montserrat-Regular.ttf")
+    format("truetype");
+
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/Montserrat-Bold.ttf")
+    format("truetype");
+
+    font-weight: 700;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+
+    font-family: "Montserrat";
+    background: #F0F8FF;
+    padding: 40px;
+}
+
+h1 {
+
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+#boardsContainer {
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#boardDescription {
+    padding-bottom: 20px;
+    font-size: large;
+}
+
+.board-card {
+
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow:
+            0 4px 12px rgba(0,0,0,0.08);
+
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.board-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 8px 20px rgba(0,0,0,0.12);
+}
+
+.board-card h3 {
+
+    font-size: 22px;
+
+    margin-bottom: 12px;
+}
+
+.board-card p {
+
+    color: #666;
+
+    line-height: 1.5;
+}
+
+#pagination {
+    margin-top: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+}
+
+#pagination button {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    min-width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: #1e3a8a;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+    padding: 14px 24px;
+}
+
+#pagination button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: #2563eb;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+#pagination button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+#pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+#pagination button.active {
+    background: #60a5fa;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+#createBtn {
+
+    
+    font-family: "Montserrat";
+    margin-top: 30px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: darkblue;
+    color: white;
+    cursor: pointer;
+}
+
+#createBtn :hover {
+    background: darkblue;
+}
+
+.editBtn :hover {
+    background: darkblue;
+}
+
+.editBtn {
+
+    font-family: "Montserrat";
+    margin-top: 30px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: darkblue;
+    color: white;
+    cursor: pointer;
+}
+
+
+
+.deleteBtn :hover {
+    background: #364fc7;
+}
+
+.deleteBtn {
+
+    font-family: "Montserrat";
+    margin-top: 30px;
+    margin-left: 10px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: darkblue;
+    color: white;
+    cursor: pointer;
+}
+
+
+
+#createStoryBtn:active {
+    transform: scale(0.97);
+}
+
+
+
+.story-card {
+
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow:
+            0 4px 12px rgba(0,0,0,0.08);
+}
+
+.story-card h3 {
+
+    margin: 12px 0;
+}
+
+.story-status {
+
+    display: inline-block;
+
+    margin-top: 12px;
+
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    background: #edf2ff;
+
+    color: #3b5bdb;
+
+    font-size: 14px;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+/* модалка */
+.modal {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+
+    z-index: 11;
+}
+
+/* скрытие */
+.hidden {
+    display: none;
+}
+
+/* toast уведомление */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    background: #2f9e44;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+
+    z-index: 20;
+}
+
+.modal input,
+.modal textarea {
+    font-family: "Montserrat";
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* buttons row */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.modal button[type="submit"] {
+    font-family: "Montserrat";
+    background: darkblue;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ===== AUTH PAGE ===== */
+
+.auth-page {
+    background: #f5f7fb;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Montserrat";
+}
+
+.auth-container {
+
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.app-title {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: darkblue;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 40px;
+}
+
+.auth-form input {
+    font-family: "Montserrat";
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.auth-form button {
+    font-family: "Montserrat";
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+
+    background: darkblue;
+    color: white;
+
+    cursor: pointer;
+}
+
+.auth-form button:hover {
+    background: darkblue;
+}
+
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background-color: #87CEEB;
+    padding: 16px;
+
+    margin-left: -40px;
+    margin-right: -40px;
+    padding-left: 40px;  
+    padding-right: 40px;
+    margin-top: -40px;
+    box-shadow:
+            0 8px 20px rgba(0,0,0,0.12);
+}
+
+.app-name {
+    font-weight: bold;
+    color: darkblue;
+    font-size: 24px;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-section img {
+    height: 24px;         /* задайте нужный размер иконки */
+    width: 24px;
+}
+
+#currentUser {
+    margin-right: 15px;
+    font-size: 14px;
+    color: black;
+}
+
+#logoutBtn {
+    font-family: "Montserrat";
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+
+    background: #fa5252;
+    color: white;
+
+    cursor: pointer;
+}
+
+#logoutBtn:hover {
+    background: #e03131;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: darkblue;
+}
+
+.error {
+
+    font-family: "Montserrat";
+    color: white;
+    background: #fa5252;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+}
+
+.hidden {
+    display: none;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;  /* выравнивание по вертикали */
+    gap: 10px;            /* расстояние между иконкой и текстом */
+}
+
+.logo-container img {
+    height: 48px;         /* задайте нужный размер иконки */
+    width: 48px;
+}
+
+.app-name {
+    /* стили для названия */
+    font-weight: bold;
+}
+
+/* ===== STORY DETAIL PAGE STYLES ===== */
+
+.story-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.story-page h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 30px;
+    border-left: 4px solid darkblue;
+    padding-left: 20px;
+}
+
+/* Основная карточка истории */
+.story-card-full {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.story-card-full:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+
+.story-card-full h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: darkblue;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+#statusSection {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.story-meta {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f8f9fa;;
+    border-radius: 10px;
+    color: #333;;
+}
+
+#storyPoints {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Статус секция */
+.story-card-full > p:first-of-type {
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding: 0;
+    background: none;
+}
+
+#statusSelect {
+    width: 100%;
+    padding: 12px;
+    font-family: "Montserrat";
+    font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    margin-bottom: 20px;
+}
+
+#statusSelect:hover {
+    border-color: darkblue;
+}
+
+#statusSelect:focus {
+    outline: none;
+    border-color: darkblue;
+    box-shadow: 0 0 0 3px rgba(0,0,139,0.1);
+}
+
+/* Кнопки действий */
+.story-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.story-actions button {
+    font-family: "Montserrat";
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 120px;
+}
+
+#runInvestBtn {
+    background: darkblue;
+    color: white;
+}
+
+#runInvestBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+#editStoryBtn {
+    background: darkblue;
+    color: white;
+}
+
+#editStoryBtn:hover {
+    background: #0000aa;
+    transform: translateY(-2px);
+}
+
+#deleteStoryBtn {
+    background: darkblue;
+    color: white;
+}
+
+#deleteStoryBtn:hover {
+    background: #0000aa;
+    transform: translateY(-2px);
+}
+
+/* INVEST секция */
+.invest-section {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.invest-section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#latestInvestContainer {
+    margin-top: 20px;
+}
+
+/* INVEST результаты */
+.invest-results {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.score-card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.score-card:hover {
+    transform: scale(1.05);
+}
+
+.score-card h4 {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.score-card .score {
+    font-size: 28px;
+    font-weight: 700;
+    color: darkblue;
+}
+
+.score-card.good .score {
+    color: #28a745;
+}
+
+.score-card.bad .score {
+    color: #dc3545;
+}
+
+.invest-details details {
+    margin-top: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.invest-details summary {
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px;
+    color: darkblue;
+}
+
+.invest-details p {
+    padding: 10px;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Модальные окна */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal h2 {
+    font-size: 24px;
+    color: darkblue;
+    margin-bottom: 20px;
+}
+
+.modal input,
+.modal textarea {
+    font-family: "Montserrat";
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.modal input:focus,
+.modal textarea:focus {
+    outline: none;
+    border-color: darkblue;
+}
+
+.modal textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal button {
+    font-family: "Montserrat";
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.modal button[type="submit"],
+#saveStoryBtn {
+    background: darkblue;
+    color: white;
+}
+
+.modal button[type="submit"]:hover,
+#saveStoryBtn:hover {
+    background: #0000aa;
+}
+
+#closeInvestModalBtn {
+    background: #6c757d;
+    color: white;
+}
+
+#closeInvestModalBtn:hover {
+    background: #5a6268;
+}
+
+
+.toast.error {
+    background: #dc3545;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Сообщения о отсутствии данных */
+.no-data-message,
+.error-message {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 16px;
+    margin: 20px 0;
+}
+
+.no-data-message {
+    color: #6c757d;
+}
+
+.error-message {
+    color: #dc3545;
+    background: #f8d7da;
+}
+
+.no-data-message button,
+.error-message button {
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: darkblue;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    body {
+        padding: 20px;
+    }
+    
+    .story-page h1 {
+        font-size: 24px;
+    }
+    
+    .story-card-full,
+    .invest-section {
+        padding: 20px;
+    }
+    
+    .story-actions {
+        flex-direction: column;
+    }
+    
+    .story-actions button {
+        width: 100%;
+    }
+    
+    .scores-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .modal {
+        width: 95%;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .scores-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Анимация загрузки */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,.3);
+    border-radius: 50%;
+    border-top-color: darkblue;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
